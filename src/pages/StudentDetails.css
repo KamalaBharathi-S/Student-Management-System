@@ -1,0 +1,290 @@
+.details-header-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.profile-grid-container {
+  display: grid;
+  grid-template-columns: 1.1fr 2fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* Left Profile Banner Card */
+.profile-banner-card {
+  padding: 0 !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-banner-hero {
+  height: 120px;
+  width: 100%;
+  opacity: 0.85;
+}
+
+.profile-avatar-wrapper {
+  margin-top: -50px;
+  padding: 0 24px;
+}
+
+.profile-large-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--bg-secondary);
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 32px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.profile-hero-content {
+  padding: 24px;
+}
+
+.profile-full-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.profile-sub-title {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+.profile-status-badge-wrap {
+  margin-top: 12px;
+}
+
+/* Tabs inside Profile Banner */
+.tabs-navigation {
+  display: flex;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  transition: all var(--transition-fast);
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--hover-bg);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background-color: var(--hover-bg);
+}
+
+/* Right Content Info Card */
+.pane-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-secondary);
+  margin-bottom: 20px;
+  border-left: 3px solid var(--primary);
+  padding-left: 10px;
+}
+
+.academic-stats-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.stat-display-box {
+  flex: 1;
+  background: var(--hover-bg);
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.stat-value-highlight {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.stat-value-highlight.text-green {
+  color: var(--color-success);
+}
+
+.gpa-progress-track {
+  height: 6px;
+  background-color: var(--border-color);
+  border-radius: 999px;
+  margin-top: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.gpa-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-gradient);
+}
+
+.details-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.info-item-block {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.info-item-block.align-top {
+  align-items: flex-start;
+}
+
+.info-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.info-label-val {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-secondary);
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 2px;
+}
+
+.info-value-block {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+.email-link {
+  color: var(--primary);
+  transition: color var(--transition-fast);
+}
+
+.email-link:hover {
+  color: var(--primary-light);
+  text-decoration: underline;
+}
+
+.address-section-block {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.mt-1 {
+  margin-top: 4px;
+}
+
+/* Error Card (Student Not Found) */
+.error-card-full {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.error-card-full h3 {
+  font-size: 22px;
+  color: var(--color-danger);
+  margin-bottom: 12px;
+}
+
+.error-card-full p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .profile-grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .details-header-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .header-action-buttons {
+    display: flex;
+  }
+  
+  .header-action-buttons button {
+    flex: 1;
+  }
+  
+  .academic-stats-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .details-info-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

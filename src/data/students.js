@@ -1,0 +1,172 @@
+export const MOCK_STUDENTS = [
+  {
+    id: "STU-2026-001",
+    name: "Alexander Wright",
+    email: "alexander.wright@university.edu",
+    phone: "9876543210",
+    department: "CSE",
+    year: "3",
+    gender: "Male",
+    dateOfBirth: "2003-04-12",
+    address: "742 Evergreen Terrace, Springfield",
+    createdAt: "2021-09-01T08:00:00.000Z",
+    gpa: 3.82,
+    status: "Active",
+    avatarColor: "linear-gradient(135deg, #6366f1, #818cf8)"
+  },
+  {
+    id: "STU-2026-002",
+    name: "Sophia Martinez",
+    email: "sophia.martinez@university.edu",
+    phone: "8765432109",
+    department: "IT",
+    year: "2",
+    gender: "Female",
+    dateOfBirth: "2004-11-23",
+    address: "123 Maple Street, Riverdale",
+    createdAt: "2022-09-01T08:00:00.000Z",
+    gpa: 3.91,
+    status: "Active",
+    avatarColor: "linear-gradient(135deg, #ec4899, #f43f5e)"
+  },
+  {
+    id: "STU-2026-003",
+    name: "Marcus Chen",
+    email: "marcus.chen@university.edu",
+    phone: "7654321098",
+    department: "CSE",
+    year: "4",
+    gender: "Male",
+    dateOfBirth: "2002-08-15",
+    address: "456 Oak Avenue, Metropolis",
+    createdAt: "2020-09-01T08:00:00.000Z",
+    gpa: 3.45,
+    status: "Graduated",
+    avatarColor: "linear-gradient(135deg, #10b981, #059669)"
+  },
+  {
+    id: "STU-2026-004",
+    name: "Emma Taylor",
+    email: "emma.taylor@university.edu",
+    phone: "6543210987",
+    department: "ECE",
+    year: "3",
+    gender: "Female",
+    dateOfBirth: "2003-01-30",
+    address: "789 Pine Lane, Gotham",
+    createdAt: "2021-09-01T08:00:00.000Z",
+    gpa: 3.68,
+    status: "Active",
+    avatarColor: "linear-gradient(135deg, #f59e0b, #d97706)"
+  },
+  {
+    id: "STU-2026-005",
+    name: "Liam O'Connor",
+    email: "liam.oconnor@university.edu",
+    phone: "5432109876",
+    department: "Mechanical",
+    year: "2",
+    gender: "Male",
+    dateOfBirth: "2004-06-05",
+    address: "321 Cedar Boulevard, Star City",
+    createdAt: "2022-09-01T08:00:00.000Z",
+    gpa: 2.92,
+    status: "Inactive",
+    avatarColor: "linear-gradient(135deg, #3b82f6, #1d4ed8)"
+  },
+  {
+    id: "STU-2026-006",
+    name: "Aria Patel",
+    email: "aria.patel@university.edu",
+    phone: "9876501234",
+    department: "EEE",
+    year: "3",
+    gender: "Female",
+    dateOfBirth: "2003-09-18",
+    address: "555 Birch Road, Central City",
+    createdAt: "2021-09-01T08:00:00.000Z",
+    gpa: 3.75,
+    status: "Active",
+    avatarColor: "linear-gradient(135deg, #8b5cf6, #7c3aed)"
+  },
+  {
+    id: "STU-2026-007",
+    name: "Lucas Jackson",
+    email: "lucas.jackson@university.edu",
+    phone: "8765012345",
+    department: "ECE",
+    year: "1",
+    gender: "Male",
+    dateOfBirth: "2005-02-14",
+    address: "888 Elm Way, Coast City",
+    createdAt: "2023-09-01T08:00:00.000Z",
+    gpa: 3.12,
+    status: "Active",
+    avatarColor: "linear-gradient(135deg, #06b6d4, #0891b2)"
+  },
+  {
+    id: "STU-2026-008",
+    name: "Olivia Kim",
+    email: "olivia.kim@university.edu",
+    phone: "7650123456",
+    department: "CSE",
+    year: "4",
+    gender: "Female",
+    dateOfBirth: "2002-12-05",
+    address: "111 Redwood Highway, Hill Valley",
+    createdAt: "2020-09-01T08:00:00.000Z",
+    gpa: 3.98,
+    status: "Graduated",
+    avatarColor: "linear-gradient(135deg, #10b981, #3b82f6)"
+  },
+  {
+    id: "STU-2026-009",
+    name: "Ethan Davis",
+    email: "ethan.davis@university.edu",
+    phone: "6501234567",
+    department: "Mechanical",
+    year: "3",
+    gender: "Male",
+    dateOfBirth: "2003-07-22",
+    address: "222 Spruce Circle, Sunnydale",
+    createdAt: "2021-09-01T08:00:00.000Z",
+    gpa: 2.45,
+    status: "Suspended",
+    avatarColor: "linear-gradient(135deg, #ef4444, #dc2626)"
+  },
+  {
+    id: "STU-2026-010",
+    name: "Isabella Rossi",
+    email: "isabella.rossi@university.edu",
+    phone: "9123456789",
+    department: "EEE",
+    year: "2",
+    gender: "Female",
+    dateOfBirth: "2004-10-09",
+    address: "333 Willow Terrace, Mystic Falls",
+    createdAt: "2022-09-01T08:00:00.000Z",
+    gpa: 3.58,
+    status: "Active",
+    avatarColor: "linear-gradient(135deg, #f43f5e, #db2777)"
+  }
+];
+
+export const GRADIENTS = [
+  "linear-gradient(135deg, #6366f1, #818cf8)",
+  "linear-gradient(135deg, #ec4899, #f43f5e)",
+  "linear-gradient(135deg, #10b981, #059669)",
+  "linear-gradient(135deg, #f59e0b, #d97706)",
+  "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+  "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+  "linear-gradient(135deg, #06b6d4, #0891b2)"
+];
+
+export const DEPARTMENTS = [
+  "CSE",
+  "ECE",
+  "EEE",
+  "IT",
+  "Mechanical"
+];
+
+export const STATUSES = ["Active", "Inactive", "Graduated", "Suspended"];

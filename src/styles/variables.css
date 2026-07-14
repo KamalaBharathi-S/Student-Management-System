@@ -1,0 +1,89 @@
+:root {
+  /* Common variables */
+  --font-primary: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-secondary: 'Plus Jakarta Sans', sans-serif;
+  
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  --header-height: 70px;
+  
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.15);
+  --color-info: #3b82f6;
+  --color-info-bg: rgba(59, 130, 246, 0.15);
+}
+
+/* Light Theme Variables */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #0f172a; /* Keep dark sidebar for premium look even in light mode */
+  --bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+  
+  --border-color: #e2e8f0;
+  --border-focus: #4f46e5;
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-light: #ffffff;
+  
+  --primary: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-glow: rgba(79, 70, 229, 0.15);
+  
+  --secondary: #0ea5e9;
+  --secondary-glow: rgba(14, 165, 233, 0.15);
+  
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(226, 232, 240, 0.8);
+  --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+  
+  --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #0ea5e9 100%);
+  --hover-bg: #f1f5f9;
+  
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+}
+
+/* Dark Theme Variables (Default) */
+[data-theme="dark"], :root:not([data-theme="light"]) {
+  --bg-primary: #080b11;
+  --bg-secondary: #0f1524;
+  --bg-sidebar: #0b0f19;
+  --bg-sidebar-hover: rgba(99, 102, 241, 0.15);
+  
+  --border-color: rgba(255, 255, 255, 0.06);
+  --border-focus: #6366f1;
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-light: #ffffff;
+  
+  --primary: #6366f1;
+  --primary-light: #a5b4fc;
+  --primary-glow: rgba(99, 102, 241, 0.25);
+  
+  --secondary: #22d3ee;
+  --secondary-glow: rgba(34, 211, 238, 0.25);
+  
+  --card-bg: rgba(15, 21, 36, 0.7);
+  --card-border: rgba(255, 255, 255, 0.05);
+  --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #22d3ee 100%);
+  --hover-bg: rgba(255, 255, 255, 0.04);
+  
+  --input-bg: rgba(11, 15, 25, 0.6);
+  --input-border: rgba(255, 255, 255, 0.08);
+}

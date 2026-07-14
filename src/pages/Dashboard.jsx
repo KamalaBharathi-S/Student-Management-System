@@ -1,24 +1,28 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { UserPlus, Users, ArrowRight, Eye, FileSpreadsheet, FileJson } from 'lucide-react';
-import { StudentContext } from '../context/StudentContext';
+import { useStudents } from '../hooks/useStudents';
 import DashboardStats from '../components/DashboardStats';
-import DepartmentChart from '../components/DepartmentChart';
+import AnalyticsCharts from '../components/AnalyticsCharts';
 import Header from '../components/Header';
-import './Dashboard.css';
+import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
-  const { students } = useContext(StudentContext);
+  const { students } = useStudents();
   const navigate = useNavigate();
 
-  // Get the 5 most recent students
   const recentStudents = students.slice(0, 5);
+
+  const getInitials = (name) => {
+    if (!name) return 'ST';
+    return name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  };
 
   const exportCSV = () => {
     if (students.length === 0) return;
-    const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'DOB', 'Gender', 'Department', 'Enrollment Date', 'GPA', 'Status'];
+    const headers = ['ID', 'Name', 'Email', 'Phone', 'Department', 'Year', 'Gender', 'Date of Birth', 'Address', 'Created At', 'GPA', 'Status'];
     const rows = students.map(s => [
-      s.id, s.firstName, s.lastName, s.email, s.phone, s.dob, s.gender, s.department, s.enrollmentDate, s.gpa, s.status
+      s.id, s.name, s.email, s.phone, s.department, s.year, s.gender, s.dateOfBirth, s.address, s.createdAt, s.gpa, s.status
     ]);
     
     const csvContent = "data:text/csv;charset=utf-8," 
@@ -53,21 +57,24 @@ const Dashboard = () => {
       <div className="page-wrapper">
         <DashboardStats />
         
-        <div className="dashboard-grid">
-          {/* Left Column: Recent Students & Exporter */}
-          <div className="dashboard-main animate-slide-up">
-            <div className="glass-card table-card">
-              <div className="card-header-flex">
+        {/* Render AnalyticsCharts (both department and year split) in middle section */}
+        <AnalyticsCharts />
+        
+        <div className={styles.dashboardGrid}>
+          {/* Recent Enrollments Table */}
+          <div className={styles.dashboardMain}>
+            <div className={styles.tableCard}>
+              <div className={styles.cardHeaderFlex}>
                 <div>
-                  <h3 className="card-title">Recent Enrollments</h3>
-                  <p className="card-subtitle">Latest 5 students added to the portal</p>
+                  <h3 className={styles.cardTitle}>Recent Enrollments</h3>
+                  <p className={styles.cardSubtitle}>Latest 5 students added to the portal</p>
                 </div>
-                <Link to="/students" className="btn-link">
+                <Link to="/students" className={styles.btnLink}>
                   View All Students <ArrowRight size={16} />
                 </Link>
               </div>
               
-              <div className="table-responsive">
+              <div className={styles.tableResponsive}>
                 {recentStudents.length > 0 ? (
                   <table className="custom-table">
                     <thead>
@@ -83,24 +90,22 @@ const Dashboard = () => {
                       {recentStudents.map((student) => (
                         <tr key={student.id}>
                           <td>
-                            <div className="student-profile-cell">
+                            <div className={styles.studentProfileCell}>
                               <div 
-                                className="student-cell-avatar" 
+                                className={styles.studentCellAvatar} 
                                 style={{ background: student.avatarColor }}
                               >
-                                {student.firstName[0]}{student.lastName[0]}
+                                {getInitials(student.name)}
                               </div>
-                              <div className="student-cell-info">
-                                <span className="student-cell-name">
-                                  {student.firstName} {student.lastName}
-                                </span>
-                                <span className="student-cell-id">{student.id}</span>
+                              <div className={styles.studentCellInfo}>
+                                <span className={styles.studentCellName}>{student.name}</span>
+                                <span className={styles.studentCellId}>{student.id}</span>
                               </div>
                             </div>
                           </td>
                           <td>{student.department}</td>
                           <td>
-                            <span className="gpa-badge">{student.gpa.toFixed(2)}</span>
+                            <span className={styles.gpaBadge}>{student.gpa.toFixed(2)}</span>
                           </td>
                           <td>
                             <span className={`badge badge-${student.status.toLowerCase()}`}>
@@ -109,7 +114,7 @@ const Dashboard = () => {
                           </td>
                           <td>
                             <button 
-                              className="action-btn-view"
+                              className={styles.actionBtnView}
                               onClick={() => navigate(`/students/${student.id}`)}
                               title="View Details"
                             >
@@ -121,21 +126,19 @@ const Dashboard = () => {
                     </tbody>
                   </table>
                 ) : (
-                  <div className="empty-state-message">No students registered yet.</div>
+                  <div className={styles.emptyStateMessage}>No students registered yet.</div>
                 )}
               </div>
             </div>
           </div>
           
-          {/* Right Column: Chart & Quick Actions */}
-          <div className="dashboard-sidebar animate-slide-right">
-            <DepartmentChart />
-            
-            <div className="glass-card actions-card">
-              <h3 className="card-title">Quick Actions</h3>
-              <p className="card-subtitle">Manage campus registrations</p>
+          {/* Quick Actions Panel */}
+          <div className={styles.dashboardSidebar}>
+            <div className={`glass-card ${styles.actionsCard}`}>
+              <h3 className={styles.cardTitle}>Quick Actions</h3>
+              <p className={styles.cardSubtitle}>Manage campus registrations</p>
               
-              <div className="action-buttons-list">
+              <div className={styles.actionButtonsList}>
                 <button 
                   className="btn btn-primary w-full"
                   onClick={() => navigate('/add')}
@@ -152,11 +155,11 @@ const Dashboard = () => {
                   Manage Database
                 </button>
                 
-                <div className="divider-line"></div>
+                <div className={styles.dividerLine}></div>
                 
-                <span className="section-label">Data Administration</span>
+                <span className={styles.sectionLabel}>Data Administration</span>
                 
-                <div className="export-buttons-row">
+                <div className={styles.exportButtonsRow}>
                   <button 
                     className="btn btn-secondary flex-1"
                     onClick={exportCSV}
@@ -164,7 +167,7 @@ const Dashboard = () => {
                     title="Export records to CSV Spreadsheet"
                   >
                     <FileSpreadsheet size={16} />
-                    Export CSV
+                    CSV
                   </button>
                   <button 
                     className="btn btn-secondary flex-1"
@@ -173,7 +176,7 @@ const Dashboard = () => {
                     title="Export records to JSON"
                   >
                     <FileJson size={16} />
-                    Export JSON
+                    JSON
                   </button>
                 </div>
               </div>

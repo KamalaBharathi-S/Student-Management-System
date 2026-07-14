@@ -1,33 +1,42 @@
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Eye, Edit2, Trash2, Plus, ArrowUpDown, SlidersHorizontal, AlertCircle } from 'lucide-react';
-import { StudentContext } from '../context/StudentContext';
+import { Search, Eye, Edit2, Trash2, Plus, AlertCircle, Trash } from 'lucide-react';
+import { useStudents } from '../hooks/useStudents';
 import Header from '../components/Header';
-import './StudentList.css';
+import styles from './StudentList.module.css';
 
 const StudentList = () => {
-  const { students, departments, statuses, deleteStudent } = useContext(StudentContext);
+  const { students, departments, statuses, deleteStudent, deleteStudentsBulk } = useStudents();
   const navigate = useNavigate();
 
   // Filters & Controls state
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  
+  // Selection state for bulk deletes
+  const [selectedIds, setSelectedIds] = useState([]);
+
+  const getInitials = (name) => {
+    if (!name) return 'ST';
+    return name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  };
 
   // Filter & Sort Pipeline
   const processedStudents = useMemo(() => {
     let result = [...students];
 
-    // 1. Searching (Name or ID)
+    // 1. Searching (Name, Email, or Department)
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
       result = result.filter(student => 
-        student.firstName.toLowerCase().includes(term) ||
-        student.lastName.toLowerCase().includes(term) ||
-        student.id.toLowerCase().includes(term)
+        (student.name && student.name.toLowerCase().includes(term)) ||
+        (student.email && student.email.toLowerCase().includes(term)) ||
+        (student.department && student.department.toLowerCase().includes(term))
       );
     }
 
@@ -41,37 +50,39 @@ const StudentList = () => {
       result = result.filter(student => student.status === selectedStatus);
     }
 
-    // 4. Sorting
+    // 4. Year Filtering
+    if (selectedYear !== '') {
+      result = result.filter(student => String(student.year) === selectedYear);
+    }
+
+    // 5. Sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'name-asc':
-          return `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`);
+          return a.name.localeCompare(b.name);
         case 'name-desc':
-          return `${b.firstName} ${b.lastName}`.localeCompare(`${a.firstName} ${a.lastName}`);
-        case 'gpa-desc':
-          return b.gpa - a.gpa;
-        case 'gpa-asc':
-          return a.gpa - b.gpa;
-        case 'id-asc':
-          return a.id.localeCompare(b.id);
-        case 'id-desc':
-          return b.id.localeCompare(a.id);
-        case 'date-desc':
-          return new Date(b.enrollmentDate) - new Date(a.enrollmentDate);
-        case 'date-asc':
-          return new Date(a.enrollmentDate) - new Date(b.enrollmentDate);
+          return b.name.localeCompare(a.name);
+        case 'dept-asc':
+          return a.department.localeCompare(b.department);
+        case 'dept-desc':
+          return b.department.localeCompare(a.department);
+        case 'year-asc':
+          return Number(a.year) - Number(b.year);
+        case 'year-desc':
+          return Number(b.year) - Number(a.year);
         default:
           return 0;
       }
     });
 
     return result;
-  }, [students, searchTerm, selectedDept, selectedStatus, sortBy]);
+  }, [students, searchTerm, selectedDept, selectedStatus, selectedYear, sortBy]);
 
-  // Reset pagination when inputs change
-  React.useEffect(() => {
+  // Reset pagination and selection when inputs change
+  useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedDept, selectedStatus, sortBy, pageSize]);
+    setSelectedIds([]);
+  }, [searchTerm, selectedDept, selectedStatus, selectedYear, sortBy, pageSize]);
 
   // Pagination calculations
   const totalItems = processedStudents.length;
@@ -84,26 +95,79 @@ const StudentList = () => {
   const handleDelete = (id, name) => {
     if (window.confirm(`Are you sure you want to delete the student records for ${name}?`)) {
       deleteStudent(id);
+      setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
     }
   };
+
+  const handleBulkDelete = () => {
+    if (window.confirm(`Are you sure you want to permanently delete all ${selectedIds.length} selected student records?`)) {
+      deleteStudentsBulk(selectedIds);
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id) => {
+    setSelectedIds(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleSelectAllVisible = (e) => {
+    if (e.target.checked) {
+      const visibleIds = paginatedStudents.map(s => s.id);
+      setSelectedIds(prev => {
+        // Merge visible IDs avoiding duplicates
+        const union = new Set([...prev, ...visibleIds]);
+        return Array.from(union);
+      });
+    } else {
+      const visibleIds = paginatedStudents.map(s => s.id);
+      setSelectedIds(prev => prev.filter(id => !visibleIds.includes(id)));
+    }
+  };
+
+  const isAllVisibleSelected = useMemo(() => {
+    if (paginatedStudents.length === 0) return false;
+    return paginatedStudents.every(s => selectedIds.includes(s.id));
+  }, [paginatedStudents, selectedIds]);
 
   return (
     <div className="main-content">
       <Header title="Student Database" />
       
       <div className="page-wrapper animate-slide-up">
+        
+        {/* Bulk Selection Actions Bar */}
+        {selectedIds.length > 0 && (
+          <div className={styles.bulkActionsBar}>
+            <span className={styles.bulkActionsText}>
+              {selectedIds.length} {selectedIds.length === 1 ? 'student' : 'students'} selected for bulk actions
+            </span>
+            <button 
+              className="btn btn-danger"
+              onClick={handleBulkDelete}
+            >
+              <Trash size={16} /> Delete Selected Records
+            </button>
+          </div>
+        )}
+
         {/* Top Controls Card */}
-        <div className="glass-card controls-card">
-          <div className="controls-flex-row">
+        <div className={`glass-card ${styles.controlsCard}`}>
+          <div className={styles.controlsFlexRow}>
             {/* Search Input */}
-            <div className="search-input-wrapper">
-              <Search className="search-icon" size={18} />
+            <div className={styles.searchInputWrapper}>
+              <Search className={styles.searchIcon} size={18} />
               <input 
                 type="text" 
-                placeholder="Search by student name or registration ID..." 
+                placeholder="Search by student name, email, or department..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className={styles.searchInput}
               />
             </div>
             
@@ -116,14 +180,14 @@ const StudentList = () => {
             </button>
           </div>
           
-          <div className="filters-grid">
+          <div className={styles.filtersGrid}>
             {/* Filter by Department */}
-            <div className="filter-group">
-              <label className="filter-label">Faculty Department</label>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Department</label>
               <select 
                 value={selectedDept} 
                 onChange={(e) => setSelectedDept(e.target.value)}
-                className="filter-select"
+                className={styles.filterSelect}
               >
                 <option value="">All Departments</option>
                 {departments.map(dept => (
@@ -133,12 +197,12 @@ const StudentList = () => {
             </div>
             
             {/* Filter by Status */}
-            <div className="filter-group">
-              <label className="filter-label">Enrolment Status</label>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Status</label>
               <select 
                 value={selectedStatus} 
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="filter-select"
+                className={styles.filterSelect}
               >
                 <option value="">All Statuses</option>
                 {statuses.map(stat => (
@@ -146,33 +210,47 @@ const StudentList = () => {
                 ))}
               </select>
             </div>
+
+            {/* Filter by Year */}
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Year</label>
+              <select 
+                value={selectedYear} 
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className={styles.filterSelect}
+              >
+                <option value="">All Years</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
             
             {/* Sort options */}
-            <div className="filter-group">
-              <label className="filter-label">Sort Records By</label>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Sort By</label>
               <select 
                 value={sortBy} 
                 onChange={(e) => setSortBy(e.target.value)}
-                className="filter-select"
+                className={styles.filterSelect}
               >
                 <option value="name-asc">Name (A - Z)</option>
                 <option value="name-desc">Name (Z - A)</option>
-                <option value="gpa-desc">GPA (Highest first)</option>
-                <option value="gpa-asc">GPA (Lowest first)</option>
-                <option value="id-asc">Student ID (Ascending)</option>
-                <option value="id-desc">Student ID (Descending)</option>
-                <option value="date-desc">Enrolled (Newest first)</option>
-                <option value="date-asc">Enrolled (Oldest first)</option>
+                <option value="dept-asc">Department (A - Z)</option>
+                <option value="dept-desc">Department (Z - A)</option>
+                <option value="year-asc">Year (1 - 4)</option>
+                <option value="year-desc">Year (4 - 1)</option>
               </select>
             </div>
 
             {/* Page Size Select */}
-            <div className="filter-group">
-              <label className="filter-label">Page Size</label>
+            <div className={styles.filterGroup}>
+              <label className={styles.filterLabel}>Page Size</label>
               <select 
                 value={pageSize} 
                 onChange={(e) => setPageSize(Number(e.target.value))}
-                className="filter-select"
+                className={styles.filterSelect}
               >
                 <option value={5}>5 entries</option>
                 <option value={10}>10 entries</option>
@@ -184,18 +262,30 @@ const StudentList = () => {
         </div>
 
         {/* Database List / Table Card */}
-        <div className="glass-card list-card">
+        <div className={styles.listCard}>
+          <div className="table-header-info-row" style={{ marginBottom: '14px', fontSize: '14px', color: 'var(--text-secondary)', fontWeight: '600' }}>
+            Total Database Count: <span className="highlight-text" style={{ color: 'var(--primary-light)' }}>{students.length}</span> records
+          </div>
+
           {paginatedStudents.length > 0 ? (
             <>
               {/* Desktop Table View */}
-              <div className="desktop-view-container">
+              <div className={styles.desktopViewContainer}>
                 <table className="custom-table">
                   <thead>
                     <tr>
+                      <th className={styles.checkboxCell}>
+                        <input 
+                          type="checkbox" 
+                          checked={isAllVisibleSelected}
+                          onChange={handleSelectAllVisible}
+                          className={styles.checkboxInput}
+                        />
+                      </th>
                       <th>Student</th>
                       <th>GPA</th>
                       <th>Department</th>
-                      <th>Enrolled Date</th>
+                      <th>Year</th>
                       <th>Status</th>
                       <th style={{ textAlign: 'right' }}>Actions</th>
                     </tr>
@@ -203,53 +293,57 @@ const StudentList = () => {
                   <tbody>
                     {paginatedStudents.map(student => (
                       <tr key={student.id}>
+                        <td className={styles.checkboxCell}>
+                          <input 
+                            type="checkbox" 
+                            checked={selectedIds.includes(student.id)}
+                            onChange={() => handleSelectRow(student.id)}
+                            className={styles.checkboxInput}
+                          />
+                        </td>
                         <td>
-                          <div className="student-profile-cell">
+                          <div className={styles.studentProfileCell}>
                             <div 
-                              className="student-cell-avatar" 
+                              className={styles.studentCellAvatar} 
                               style={{ background: student.avatarColor }}
                             >
-                              {student.firstName[0]}{student.lastName[0]}
+                              {getInitials(student.name)}
                             </div>
-                            <div className="student-cell-info">
-                              <span className="student-cell-name">
-                                {student.firstName} {student.lastName}
-                              </span>
-                              <span className="student-cell-id">{student.id}</span>
+                            <div className={styles.studentCellInfo}>
+                              <span className={styles.studentCellName}>{student.name}</span>
+                              <span className={styles.studentCellId}>{student.id}</span>
                             </div>
                           </div>
                         </td>
                         <td>
-                          <span className="gpa-badge">{student.gpa.toFixed(2)}</span>
+                          <span className={styles.gpaBadge}>{student.gpa.toFixed(2)}</span>
                         </td>
                         <td>{student.department}</td>
-                        <td>{new Date(student.enrollmentDate).toLocaleDateString('en-US', {
-                          year: 'numeric', month: 'short', day: 'numeric'
-                        })}</td>
+                        <td>Year {student.year}</td>
                         <td>
                           <span className={`badge badge-${student.status.toLowerCase()}`}>
                             {student.status}
                           </span>
                         </td>
                         <td>
-                          <div className="actions-cell-row">
+                          <div className={styles.actionsCellRow}>
                             <button 
-                              className="action-btn-view"
+                              className={styles.actionBtnView}
                               onClick={() => navigate(`/students/${student.id}`)}
                               title="View Profile"
                             >
                               <Eye size={16} />
                             </button>
                             <button 
-                              className="action-btn-edit"
+                              className={styles.actionBtnEdit}
                               onClick={() => navigate(`/edit/${student.id}`)}
                               title="Edit Record"
                             >
                               <Edit2 size={16} />
                             </button>
                             <button 
-                              className="action-btn-delete"
-                              onClick={() => handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
+                              className={styles.actionBtnDelete}
+                              onClick={() => handleDelete(student.id, student.name)}
                               title="Remove Student"
                             >
                               <Trash2 size={16} />
@@ -263,22 +357,28 @@ const StudentList = () => {
               </div>
 
               {/* Mobile Card View */}
-              <div className="mobile-view-container">
+              <div className={styles.mobileViewContainer}>
                 {paginatedStudents.map(student => (
-                  <div key={student.id} className="mobile-student-card">
-                    <div className="mobile-card-top">
-                      <div className="student-profile-cell">
+                  <div key={student.id} className={styles.mobileStudentCard}>
+                    <div className={styles.mobileCheckboxWrapper}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedIds.includes(student.id)}
+                        onChange={() => handleSelectRow(student.id)}
+                        className={styles.checkboxInput}
+                      />
+                    </div>
+                    <div className={styles.mobileCardTop}>
+                      <div className={styles.studentProfileCell}>
                         <div 
-                          className="student-cell-avatar" 
+                          className={styles.studentCellAvatar} 
                           style={{ background: student.avatarColor }}
                         >
-                          {student.firstName[0]}{student.lastName[0]}
+                          {getInitials(student.name)}
                         </div>
-                        <div className="student-cell-info">
-                          <span className="student-cell-name">
-                            {student.firstName} {student.lastName}
-                          </span>
-                          <span className="student-cell-id">{student.id}</span>
+                        <div className={styles.studentCellInfo}>
+                          <span className={styles.studentCellName}>{student.name}</span>
+                          <span className={styles.studentCellId}>{student.id}</span>
                         </div>
                       </div>
                       <span className={`badge badge-${student.status.toLowerCase()}`}>
@@ -286,33 +386,37 @@ const StudentList = () => {
                       </span>
                     </div>
                     
-                    <div className="mobile-card-body">
-                      <div className="mobile-card-stat">
-                        <span className="mobile-stat-label">Department:</span>
-                        <span className="mobile-stat-val">{student.department}</span>
+                    <div className={styles.mobileCardBody}>
+                      <div className={styles.mobileCardStat}>
+                        <span className={styles.mobileStatLabel}>Department:</span>
+                        <span className={styles.mobileStatVal}>{student.department}</span>
                       </div>
-                      <div className="mobile-card-stat">
-                        <span className="mobile-stat-label">GPA:</span>
-                        <span className="mobile-stat-val gpa-badge">{student.gpa.toFixed(2)}</span>
+                      <div className={styles.mobileCardStat}>
+                        <span className={styles.mobileStatLabel}>Year:</span>
+                        <span className={styles.mobileStatVal}>Year {student.year}</span>
+                      </div>
+                      <div className={styles.mobileCardStat}>
+                        <span className={styles.mobileStatLabel}>GPA:</span>
+                        <span className={`${styles.mobileStatVal} ${styles.gpaBadge}`}>{student.gpa.toFixed(2)}</span>
                       </div>
                     </div>
                     
-                    <div className="mobile-card-actions">
+                    <div className={styles.mobileCardActions}>
                       <button 
-                        className="mobile-action-btn view"
+                        className={`${styles.mobileActionBtn} ${styles.view}`}
                         onClick={() => navigate(`/students/${student.id}`)}
                       >
                         <Eye size={16} /> Details
                       </button>
                       <button 
-                        className="mobile-action-btn edit"
+                        className={`${styles.mobileActionBtn} ${styles.edit}`}
                         onClick={() => navigate(`/edit/${student.id}`)}
                       >
                         <Edit2 size={16} /> Edit
                       </button>
                       <button 
-                        className="mobile-action-btn delete"
-                        onClick={() => handleDelete(student.id, `${student.firstName} ${student.lastName}`)}
+                        className={`${styles.mobileActionBtn} ${styles.delete}`}
+                        onClick={() => handleDelete(student.id, student.name)}
                       >
                         <Trash2 size={16} /> Delete
                       </button>
@@ -322,20 +426,20 @@ const StudentList = () => {
               </div>
 
               {/* Pagination Controls */}
-              <div className="pagination-wrapper">
-                <div className="pagination-info">
-                  Showing <span className="highlight-text">{startIndex + 1}</span> to{' '}
-                  <span className="highlight-text">
+              <div className={styles.paginationWrapper}>
+                <div className={styles.paginationInfo}>
+                  Showing <span className={styles.highlightText}>{startIndex + 1}</span> to{' '}
+                  <span className={styles.highlightText}>
                     {Math.min(startIndex + pageSize, totalItems)}
                   </span>{' '}
-                  of <span className="highlight-text">{totalItems}</span> students
+                  of <span className={styles.highlightText}>{totalItems}</span> students
                 </div>
                 
-                <div className="pagination-buttons">
+                <div className={styles.paginationButtons}>
                   <button 
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="pagination-btn"
+                    className={styles.paginationBtn}
                   >
                     Previous
                   </button>
@@ -344,7 +448,7 @@ const StudentList = () => {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`pagination-btn page-num-btn ${currentPage === page ? 'active' : ''}`}
+                      className={`${styles.paginationBtn} ${styles.pageNumBtn} ${currentPage === page ? styles.active : ''}`}
                     >
                       {page}
                     </button>
@@ -353,7 +457,7 @@ const StudentList = () => {
                   <button 
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="pagination-btn"
+                    className={styles.paginationBtn}
                   >
                     Next
                   </button>
@@ -361,8 +465,8 @@ const StudentList = () => {
               </div>
             </>
           ) : (
-            <div className="empty-results-card">
-              <AlertCircle size={40} className="empty-icon" />
+            <div className={styles.emptyResultsCard}>
+              <AlertCircle size={40} className={styles.emptyIcon} />
               <h4>No Records Found</h4>
               <p>Your search filters returned zero matching results. Try modifying keywords or selectors.</p>
               <button 
@@ -371,6 +475,7 @@ const StudentList = () => {
                   setSearchTerm('');
                   setSelectedDept('');
                   setSelectedStatus('');
+                  setSelectedYear('');
                 }}
               >
                 Reset Search Filters

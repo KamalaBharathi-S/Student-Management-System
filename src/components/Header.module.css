@@ -11,32 +11,32 @@
   transition: background-color var(--transition-normal);
 }
 
-.header-left {
+.headerLeft {
   display: flex;
   flex-direction: column;
 }
 
-.header-title {
+.headerTitle {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
-.header-subtitle {
+.headerSubtitle {
   font-size: 13px;
   color: var(--text-muted);
   font-weight: 500;
   margin-top: 2px;
 }
 
-.header-right {
+.headerRight {
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.theme-toggle-btn, .icon-btn {
+.themeToggleBtn, .iconBtn {
   width: 42px;
   height: 42px;
   border-radius: 10px;
@@ -49,25 +49,25 @@
   transition: all var(--transition-fast);
 }
 
-.theme-toggle-btn:hover, .icon-btn:hover {
+.themeToggleBtn:hover, .iconBtn:hover {
   background: var(--border-color);
   color: var(--text-primary);
   transform: translateY(-1px);
 }
 
-.theme-toggle-btn svg {
+.themeToggleBtn svg {
   transition: transform var(--transition-normal) ease;
 }
 
-.theme-toggle-btn:hover svg {
+.themeToggleBtn:hover svg {
   transform: rotate(30deg);
 }
 
-.notification-wrapper {
+.notificationWrapper {
   position: relative;
 }
 
-.notification-badge {
+.notificationBadge {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -78,13 +78,13 @@
   border: 2px solid var(--bg-secondary);
 }
 
-.header-divider {
+.headerDivider {
   width: 1px;
   height: 24px;
   background-color: var(--border-color);
 }
 
-.admin-profile {
+.adminProfile {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -94,14 +94,14 @@
   border: 1px solid var(--border-color);
 }
 
-.admin-avatar {
+.adminAvatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.admin-fallback-avatar {
+.adminFallbackAvatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
@@ -114,36 +114,34 @@
   font-size: 11px;
 }
 
-/* Hide fallback if image loaded successfully */
-.admin-avatar + .admin-fallback-avatar {
+.adminAvatar + .adminFallbackAvatar {
   display: none;
 }
 
-.admin-name {
+.adminName {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .header {
     padding: 0 16px;
   }
   
-  .header-title {
+  .headerTitle {
     font-size: 18px;
   }
   
-  .header-subtitle {
+  .headerSubtitle {
     display: none;
   }
   
-  .admin-name {
+  .adminName {
     display: none;
   }
   
-  .admin-profile {
+  .adminProfile {
     padding: 4px;
   }
 }

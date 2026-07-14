@@ -1,24 +1,24 @@
-.controls-card {
+.controlsCard {
   margin-bottom: 24px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.controls-flex-row {
+.controlsFlexRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
 }
 
-.search-input-wrapper {
+.searchInputWrapper {
   position: relative;
   flex: 1;
   max-width: 600px;
 }
 
-.search-icon {
+.searchIcon {
   position: absolute;
   left: 16px;
   top: 50%;
@@ -27,7 +27,7 @@
   pointer-events: none;
 }
 
-.search-input {
+.searchInput {
   width: 100%;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
@@ -38,25 +38,25 @@
   transition: all var(--transition-fast);
 }
 
-.search-input:focus {
+.searchInput:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--primary-glow);
   background: var(--bg-secondary);
 }
 
-.filters-grid {
+.filtersGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
 }
 
-.filter-group {
+.filterGroup {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.filter-label {
+.filterLabel {
   font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
@@ -65,7 +65,7 @@
   font-family: var(--font-secondary);
 }
 
-.filter-select {
+.filterSelect {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 8px;
@@ -76,19 +76,58 @@
   cursor: pointer;
 }
 
-.filter-select:focus {
+.filterSelect:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
-/* Action button configurations inside table row */
-.actions-cell-row {
+.studentProfileCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.studentCellAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.studentCellInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.studentCellName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.studentCellId {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.gpaBadge {
+  font-weight: 700;
+  font-family: var(--font-secondary);
+}
+
+.actionsCellRow {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
 }
 
-.action-btn-edit, .action-btn-delete {
+.actionBtnView, .actionBtnEdit, .actionBtnDelete {
   background: var(--hover-bg);
   border: 1px solid var(--border-color);
   width: 36px;
@@ -101,22 +140,28 @@
   transition: all var(--transition-fast);
 }
 
-.action-btn-edit:hover {
+.actionBtnView:hover {
+  background: var(--primary-glow);
+  color: var(--primary);
+  border-color: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.actionBtnEdit:hover {
   background: rgba(245, 158, 11, 0.1);
   color: var(--color-warning);
   border-color: rgba(245, 158, 11, 0.4);
   transform: translateY(-1px);
 }
 
-.action-btn-delete:hover {
+.actionBtnDelete:hover {
   background: rgba(239, 68, 68, 0.1);
   color: var(--color-danger);
   border-color: rgba(239, 68, 68, 0.4);
   transform: translateY(-1px);
 }
 
-/* Pagination container */
-.pagination-wrapper {
+.paginationWrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -125,23 +170,23 @@
   border-top: 1px solid var(--border-color);
 }
 
-.pagination-info {
+.paginationInfo {
   font-size: 14px;
   color: var(--text-secondary);
 }
 
-.highlight-text {
+.highlightText {
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.pagination-buttons {
+.paginationButtons {
   display: flex;
   gap: 6px;
   align-items: center;
 }
 
-.pagination-btn {
+.paginationBtn {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   padding: 8px 16px;
@@ -152,33 +197,32 @@
   color: var(--text-secondary);
 }
 
-.pagination-btn:hover:not(:disabled) {
+.paginationBtn:hover:not(:disabled) {
   background: var(--hover-bg);
   color: var(--text-primary);
   border-color: var(--text-muted);
 }
 
-.pagination-btn:disabled {
+.paginationBtn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.page-num-btn {
+.pageNumBtn {
   padding: 8px 12px;
   min-width: 38px;
   display: flex;
   justify-content: center;
 }
 
-.page-num-btn.active {
+.pageNumBtn.active {
   background: var(--accent-gradient);
   color: var(--text-light);
   border-color: transparent;
   box-shadow: 0 4px 10px var(--primary-glow);
 }
 
-/* Empty search result states */
-.empty-results-card {
+.emptyResultsCard {
   text-align: center;
   padding: 60px 24px;
   display: flex;
@@ -187,64 +231,109 @@
   gap: 16px;
 }
 
-.empty-icon {
+.emptyIcon {
   color: var(--text-muted);
 }
 
-.empty-results-card h4 {
+.emptyResultsCard h4 {
   font-size: 20px;
   color: var(--text-primary);
 }
 
-.empty-results-card p {
+.emptyResultsCard p {
   color: var(--text-secondary);
   font-size: 15px;
   max-width: 400px;
   margin-bottom: 8px;
 }
 
-/* Visibility triggers for Mobile vs Desktop */
-.desktop-view-container {
+.desktopViewContainer {
   display: block;
 }
 
-.mobile-view-container {
+.mobileViewContainer {
   display: none;
 }
 
-/* Responsiveness adjustments */
-@media (max-width: 1024px) {
-  .filters-grid {
-    grid-template-columns: repeat(2, 1fr);
+.listCard {
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  padding: 24px;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border var(--transition-normal);
+}
+
+.listCard:hover {
+  border-color: rgba(99, 102, 241, 0.25);
+  box-shadow: var(--card-shadow), 0 15px 30px -10px var(--primary-glow);
+}
+
+/* Bulk Selection Styles */
+.bulkActionsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-danger-bg);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 12px 24px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  animation: slideUp var(--transition-fast) forwards;
+}
+
+.bulkActionsText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.checkboxCell {
+  width: 48px;
+  text-align: center;
+}
+
+.checkboxInput {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
+
+@media (max-width: 1200px) {
+  .filtersGrid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .controls-flex-row {
+  .controlsFlexRow {
     flex-direction: column;
     align-items: stretch;
   }
   
-  .search-input-wrapper {
+  .searchInputWrapper {
     max-width: none;
   }
   
-  .filters-grid {
+  .filtersGrid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
   
-  .desktop-view-container {
+  .desktopViewContainer {
     display: none;
   }
   
-  .mobile-view-container {
+  .mobileViewContainer {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
   
-  .mobile-student-card {
+  .mobileStudentCard {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -252,15 +341,23 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    position: relative;
+  }
+
+  .mobileCheckboxWrapper {
+    position: absolute;
+    top: 16px;
+    right: 16px;
   }
   
-  .mobile-card-top {
+  .mobileCardTop {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    padding-right: 28px; /* avoid overlap with checkbox */
   }
   
-  .mobile-card-body {
+  .mobileCardBody {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -269,28 +366,28 @@
     border-bottom: 1px solid var(--border-color);
   }
   
-  .mobile-card-stat {
+  .mobileCardStat {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
   }
   
-  .mobile-stat-label {
+  .mobileStatLabel {
     color: var(--text-muted);
     font-weight: 500;
   }
   
-  .mobile-stat-val {
+  .mobileStatVal {
     color: var(--text-primary);
     font-weight: 600;
   }
   
-  .mobile-card-actions {
+  .mobileCardActions {
     display: flex;
     gap: 8px;
   }
   
-  .mobile-action-btn {
+  .mobileActionBtn {
     flex: 1;
     display: inline-flex;
     align-items: center;
@@ -305,25 +402,31 @@
     border: 1px solid var(--border-color);
   }
   
-  .mobile-action-btn.view {
+  .mobileActionBtn.view {
     color: var(--primary-light);
   }
   
-  .mobile-action-btn.edit {
+  .mobileActionBtn.edit {
     color: var(--color-warning);
   }
   
-  .mobile-action-btn.delete {
+  .mobileActionBtn.delete {
     color: var(--color-danger);
   }
   
-  .mobile-action-btn:hover {
+  .mobileActionBtn:hover {
     background: var(--border-color);
   }
   
-  .pagination-wrapper {
+  .paginationWrapper {
     flex-direction: column;
     gap: 16px;
+    text-align: center;
+  }
+
+  .bulkActionsBar {
+    flex-direction: column;
+    gap: 12px;
     text-align: center;
   }
 }

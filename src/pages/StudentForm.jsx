@@ -1,25 +1,25 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle, Check } from 'lucide-react';
-import { StudentContext } from '../context/StudentContext';
+import { useStudents } from '../hooks/useStudents';
+import { validateStudentForm } from '../utils/validation';
 import Header from '../components/Header';
-import './StudentForm.css';
+import styles from './StudentForm.module.css';
 
 const StudentForm = () => {
-  const { addStudent, updateStudent, getStudentById, departments, statuses } = useContext(StudentContext);
+  const { addStudent, updateStudent, getStudentById, departments, statuses } = useStudents();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
 
   const initialFormState = {
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '',
-    dob: '',
+    dateOfBirth: '',
     gender: 'Male',
     department: departments[0] || 'Computer Science',
-    enrollmentDate: new Date().toISOString().slice(0, 10),
+    year: '1',
     gpa: '',
     status: 'Active',
     address: ''
@@ -29,7 +29,6 @@ const StudentForm = () => {
   const [errors, setErrors] = useState({});
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Load student data if in edit mode
   useEffect(() => {
     if (isEditMode) {
       const student = getStudentById(id);
@@ -39,7 +38,6 @@ const StudentForm = () => {
           gpa: String(student.gpa)
         });
       } else {
-        // Redirect to database list if student not found
         navigate('/students');
       }
     }
@@ -52,7 +50,6 @@ const StudentForm = () => {
       [name]: value
     }));
     
-    // Clear validation error when field is updated
     if (errors[name]) {
       setErrors(prev => {
         const next = { ...prev };
@@ -62,61 +59,14 @@ const StudentForm = () => {
     }
   };
 
-  const validate = () => {
-    const tempErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
-    if (!formData.firstName.trim()) {
-      tempErrors.firstName = "First name is required.";
-    } else if (formData.firstName.trim().length < 2) {
-      tempErrors.firstName = "First name must be at least 2 characters.";
-    }
-    
-    if (!formData.lastName.trim()) {
-      tempErrors.lastName = "Last name is required.";
-    } else if (formData.lastName.trim().length < 2) {
-      tempErrors.lastName = "Last name must be at least 2 characters.";
-    }
-    
-    if (!formData.email.trim()) {
-      tempErrors.email = "Email address is required.";
-    } else if (!emailRegex.test(formData.email.trim())) {
-      tempErrors.email = "Please enter a valid email address.";
-    }
-    
-    if (!formData.phone.trim()) {
-      tempErrors.phone = "Phone number is required.";
-    }
-    
-    if (!formData.dob) {
-      tempErrors.dob = "Date of birth is required.";
-    } else {
-      const ageLimitDate = new Date();
-      ageLimitDate.setFullYear(ageLimitDate.getFullYear() - 15);
-      const dobDate = new Date(formData.dob);
-      if (dobDate > ageLimitDate) {
-        tempErrors.dob = "Students must be at least 15 years old.";
-      }
-    }
-    
-    if (!formData.enrollmentDate) {
-      tempErrors.enrollmentDate = "Enrollment date is required.";
-    }
-    
-    const gpaVal = parseFloat(formData.gpa);
-    if (formData.gpa === '' || isNaN(gpaVal)) {
-      tempErrors.gpa = "GPA score is required.";
-    } else if (gpaVal < 0 || gpaVal > 4.0) {
-      tempErrors.gpa = "GPA must be between 0.00 and 4.00.";
-    }
-
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    const validationResult = validateStudentForm(formData);
+    
+    if (!validationResult.isValid) {
+      setErrors(validationResult.errors);
+      return;
+    }
 
     if (isEditMode) {
       updateStudent(id, formData);
@@ -141,7 +91,7 @@ const StudentForm = () => {
       
       <div className="page-wrapper animate-slide-up">
         {/* Back Link */}
-        <div className="navigation-back-wrapper">
+        <div className={styles.navigationBackWrapper}>
           <Link to={isEditMode ? `/students/${id}` : "/students"} className="btn-link">
             <ArrowLeft size={16} /> Back to Database
           </Link>
@@ -149,7 +99,7 @@ const StudentForm = () => {
 
         {/* Success Alert Banner */}
         {submitSuccess && (
-          <div className="alert alert-success animate-fade">
+          <div className={`${styles.alert} ${styles.alertSuccess} animate-fade`}>
             <Check size={20} />
             <span>
               Student record has been successfully {isEditMode ? "updated" : "saved"}! Redirecting...
@@ -158,56 +108,40 @@ const StudentForm = () => {
         )}
 
         {/* Form Container */}
-        <form onSubmit={handleSubmit} className="glass-card student-form">
+        <form onSubmit={handleSubmit} className={`glass-card ${styles.studentForm}`}>
           
           {/* Section 1: Personal Details */}
-          <div className="form-section">
-            <h4 className="section-title">Personal Information</h4>
-            <div className="fields-grid-2col">
+          <div className={styles.formSection}>
+            <h4 className={styles.sectionTitle}>Personal Information</h4>
+            <div className={styles.fieldsGrid2col}>
               <div className="form-group">
-                <label className="form-label" htmlFor="firstName">First Name</label>
+                <label className="form-label" htmlFor="name">Full Name</label>
                 <input 
                   type="text" 
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
-                  className={`form-input ${errors.firstName ? 'input-error' : ''}`}
-                  placeholder="e.g. Eleanor"
+                  className={`form-input ${errors.name ? styles.inputError : ''}`}
+                  placeholder="e.g. Eleanor Vance"
                 />
-                {errors.firstName && (
-                  <span className="form-error"><AlertCircle size={12} /> {errors.firstName}</span>
+                {errors.name && (
+                  <span className="form-error"><AlertCircle size={12} /> {errors.name}</span>
                 )}
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="lastName">Last Name</label>
-                <input 
-                  type="text" 
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className={`form-input ${errors.lastName ? 'input-error' : ''}`}
-                  placeholder="e.g. Vance"
-                />
-                {errors.lastName && (
-                  <span className="form-error"><AlertCircle size={12} /> {errors.lastName}</span>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="dob">Date of Birth</label>
+                <label className="form-label" htmlFor="dateOfBirth">Date of Birth</label>
                 <input 
                   type="date" 
-                  id="dob"
-                  name="dob"
-                  value={formData.dob}
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className={`form-input ${errors.dob ? 'input-error' : ''}`}
+                  className={`form-input ${errors.dateOfBirth ? styles.inputError : ''}`}
                 />
-                {errors.dob && (
-                  <span className="form-error"><AlertCircle size={12} /> {errors.dob}</span>
+                {errors.dateOfBirth && (
+                  <span className="form-error"><AlertCircle size={12} /> {errors.dateOfBirth}</span>
                 )}
               </div>
 
@@ -226,13 +160,32 @@ const StudentForm = () => {
                   <option value="Other">Other</option>
                 </select>
               </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="year">Academic Year</label>
+                <select 
+                  id="year"
+                  name="year"
+                  value={formData.year}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  <option value="1">1st Year (Freshman)</option>
+                  <option value="2">2nd Year (Sophomore)</option>
+                  <option value="3">3rd Year (Junior)</option>
+                  <option value="4">4th Year (Senior)</option>
+                </select>
+                {errors.year && (
+                  <span className="form-error"><AlertCircle size={12} /> {errors.year}</span>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Section 2: Contact Information */}
-          <div className="form-section">
-            <h4 className="section-title">Contact & Location</h4>
-            <div className="fields-grid-2col">
+          <div className={styles.formSection}>
+            <h4 className={styles.sectionTitle}>Contact & Location</h4>
+            <div className={styles.fieldsGrid2col}>
               <div className="form-group">
                 <label className="form-label" htmlFor="email">Email Address</label>
                 <input 
@@ -241,7 +194,7 @@ const StudentForm = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`form-input ${errors.email ? 'input-error' : ''}`}
+                  className={`form-input ${errors.email ? styles.inputError : ''}`}
                   placeholder="name@university.edu"
                 />
                 {errors.email && (
@@ -257,8 +210,8 @@ const StudentForm = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className={`form-input ${errors.phone ? 'input-error' : ''}`}
-                  placeholder="+1 (555) 000-0000"
+                  className={`form-input ${errors.phone ? styles.inputError : ''}`}
+                  placeholder="e.g. 9876543210"
                 />
                 {errors.phone && (
                   <span className="form-error"><AlertCircle size={12} /> {errors.phone}</span>
@@ -281,9 +234,9 @@ const StudentForm = () => {
           </div>
 
           {/* Section 3: Academic Information */}
-          <div className="form-section">
-            <h4 className="section-title">Academic Details</h4>
-            <div className="fields-grid-3col">
+          <div className={styles.formSection}>
+            <h4 className={styles.sectionTitle}>Academic Details</h4>
+            <div className={styles.fieldsGrid3col}>
               <div className="form-group">
                 <label className="form-label" htmlFor="department">Department</label>
                 <select 
@@ -310,7 +263,7 @@ const StudentForm = () => {
                   name="gpa"
                   value={formData.gpa}
                   onChange={handleChange}
-                  className={`form-input ${errors.gpa ? 'input-error' : ''}`}
+                  className={`form-input ${errors.gpa ? styles.inputError : ''}`}
                   placeholder="0.00 - 4.00"
                 />
                 {errors.gpa && (
@@ -318,24 +271,7 @@ const StudentForm = () => {
                 )}
               </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="enrollmentDate">Enrolment Date</label>
-                <input 
-                  type="date" 
-                  id="enrollmentDate"
-                  name="enrollmentDate"
-                  value={formData.enrollmentDate}
-                  onChange={handleChange}
-                  className={`form-input ${errors.enrollmentDate ? 'input-error' : ''}`}
-                />
-                {errors.enrollmentDate && (
-                  <span className="form-error"><AlertCircle size={12} /> {errors.enrollmentDate}</span>
-                )}
-              </div>
-            </div>
-
-            {isEditMode && (
-              <div className="fields-grid-3col">
+              {isEditMode && (
                 <div className="form-group">
                   <label className="form-label" htmlFor="status">Enrolment Status</label>
                   <select 
@@ -350,12 +286,12 @@ const StudentForm = () => {
                     ))}
                   </select>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Form Actions */}
-          <div className="form-actions-wrapper">
+          <div className={styles.formActionsWrapper}>
             <button 
               type="button" 
               className="btn btn-secondary"

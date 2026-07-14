@@ -1,14 +1,14 @@
-.navigation-back-wrapper {
+.navigationBackWrapper {
   margin-bottom: 24px;
 }
 
-.student-form {
+.studentForm {
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
 
-.form-section {
+.formSection {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -16,12 +16,12 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.form-section:last-of-type {
+.formSection:last-of-type {
   border-bottom: none;
   padding-bottom: 0;
 }
 
-.section-title {
+.sectionTitle {
   font-size: 16px;
   font-weight: 700;
   color: var(--text-primary);
@@ -31,35 +31,33 @@
   padding-left: 10px;
 }
 
-/* Grids for inputs */
-.fields-grid-2col {
+.fieldsGrid2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-.fields-grid-3col {
+.fieldsGrid3col {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
-.input-error {
+.inputError {
   border-color: var(--color-danger) !important;
 }
 
-.input-error:focus {
+.inputError:focus {
   box-shadow: 0 0 0 3px var(--color-danger-bg) !important;
 }
 
-.form-actions-wrapper {
+.formActionsWrapper {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;
 }
 
-/* Success Banner styling */
 .alert {
   display: flex;
   align-items: center;
@@ -71,25 +69,24 @@
   margin-bottom: 24px;
 }
 
-.alert-success {
+.alertSuccess {
   background-color: var(--color-success-bg);
   color: var(--color-success);
   border: 1px solid rgba(16, 185, 129, 0.3);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
 }
 
-/* Responsiveness */
 @media (max-width: 768px) {
-  .fields-grid-2col, .fields-grid-3col {
+  .fieldsGrid2col, .fieldsGrid3col {
     grid-template-columns: 1fr;
     gap: 16px;
   }
   
-  .form-actions-wrapper {
+  .formActionsWrapper {
     flex-direction: column-reverse;
   }
   
-  .form-actions-wrapper button {
+  .formActionsWrapper button {
     width: 100%;
   }
 }

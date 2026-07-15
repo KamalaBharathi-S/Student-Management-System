@@ -6,15 +6,13 @@ import Header from '../components/Header';
 import styles from './StudentList.module.css';
 
 const StudentList = () => {
-  const { students, departments, statuses, deleteStudent, deleteStudentsBulk } = useStudents();
+  const { students, statuses, deleteStudent, deleteStudentsBulk } = useStudents();
   const navigate = useNavigate();
 
   // Filters & Controls state
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDept, setSelectedDept] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
-  const [sortBy, setSortBy] = useState('name-asc');
+  const [sortBy, setSortBy] = useState('rollNo-asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   
@@ -30,59 +28,44 @@ const StudentList = () => {
   const processedStudents = useMemo(() => {
     let result = [...students];
 
-    // 1. Searching (Name, Email, or Department)
+    // 1. Searching (Name, Email)
     if (searchTerm.trim() !== '') {
       const term = searchTerm.toLowerCase();
       result = result.filter(student => 
         (student.name && student.name.toLowerCase().includes(term)) ||
-        (student.email && student.email.toLowerCase().includes(term)) ||
-        (student.department && student.department.toLowerCase().includes(term))
+        (student.email && student.email.toLowerCase().includes(term))
       );
     }
 
-    // 2. Department Filtering
-    if (selectedDept !== '') {
-      result = result.filter(student => student.department === selectedDept);
-    }
-
-    // 3. Status Filtering
+    // 2. Status Filtering
     if (selectedStatus !== '') {
       result = result.filter(student => student.status === selectedStatus);
     }
 
-    // 4. Year Filtering
-    if (selectedYear !== '') {
-      result = result.filter(student => String(student.year) === selectedYear);
-    }
-
-    // 5. Sorting
+    // 3. Sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'name-asc':
           return a.name.localeCompare(b.name);
         case 'name-desc':
           return b.name.localeCompare(a.name);
-        case 'dept-asc':
-          return a.department.localeCompare(b.department);
-        case 'dept-desc':
-          return b.department.localeCompare(a.department);
-        case 'year-asc':
-          return Number(a.year) - Number(b.year);
-        case 'year-desc':
-          return Number(b.year) - Number(a.year);
+        case 'rollNo-asc':
+          return Number(a.rollNo) - Number(b.rollNo);
+        case 'rollNo-desc':
+          return Number(b.rollNo) - Number(a.rollNo);
         default:
           return 0;
       }
     });
 
     return result;
-  }, [students, searchTerm, selectedDept, selectedStatus, selectedYear, sortBy]);
+  }, [students, searchTerm, selectedStatus, sortBy]);
 
   // Reset pagination and selection when inputs change
   useEffect(() => {
     setCurrentPage(1);
     setSelectedIds([]);
-  }, [searchTerm, selectedDept, selectedStatus, selectedYear, sortBy, pageSize]);
+  }, [searchTerm, selectedStatus, sortBy, pageSize]);
 
   // Pagination calculations
   const totalItems = processedStudents.length;
@@ -181,22 +164,6 @@ const StudentList = () => {
           </div>
           
           <div className={styles.filtersGrid}>
-            {/* Filter by Department */}
-            <div className={styles.filterGroup}>
-              <label className={styles.filterLabel}>Department</label>
-              <select 
-                value={selectedDept} 
-                onChange={(e) => setSelectedDept(e.target.value)}
-                className={styles.filterSelect}
-              >
-                <option value="">All Departments</option>
-                {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Filter by Status */}
             <div className={styles.filterGroup}>
               <label className={styles.filterLabel}>Status</label>
               <select 
@@ -210,22 +177,6 @@ const StudentList = () => {
                 ))}
               </select>
             </div>
-
-            {/* Filter by Year */}
-            <div className={styles.filterGroup}>
-              <label className={styles.filterLabel}>Year</label>
-              <select 
-                value={selectedYear} 
-                onChange={(e) => setSelectedYear(e.target.value)}
-                className={styles.filterSelect}
-              >
-                <option value="">All Years</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-              </select>
-            </div>
             
             {/* Sort options */}
             <div className={styles.filterGroup}>
@@ -235,12 +186,10 @@ const StudentList = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className={styles.filterSelect}
               >
+                <option value="rollNo-asc">Roll No (Low - High)</option>
+                <option value="rollNo-desc">Roll No (High - Low)</option>
                 <option value="name-asc">Name (A - Z)</option>
                 <option value="name-desc">Name (Z - A)</option>
-                <option value="dept-asc">Department (A - Z)</option>
-                <option value="dept-desc">Department (Z - A)</option>
-                <option value="year-asc">Year (1 - 4)</option>
-                <option value="year-desc">Year (4 - 1)</option>
               </select>
             </div>
 
@@ -283,9 +232,8 @@ const StudentList = () => {
                         />
                       </th>
                       <th>Student</th>
-                      <th>GPA</th>
-                      <th>Department</th>
-                      <th>Year</th>
+                      <th>Class</th>
+                      <th>Roll No.</th>
                       <th>Status</th>
                       <th style={{ textAlign: 'right' }}>Actions</th>
                     </tr>
@@ -315,11 +263,10 @@ const StudentList = () => {
                             </div>
                           </div>
                         </td>
+                        <td>Class {student.class} – {student.section}</td>
                         <td>
-                          <span className={styles.gpaBadge}>{student.gpa.toFixed(2)}</span>
+                          <span className={styles.gpaBadge}>#{student.rollNo}</span>
                         </td>
-                        <td>{student.department}</td>
-                        <td>Year {student.year}</td>
                         <td>
                           <span className={`badge badge-${student.status.toLowerCase()}`}>
                             {student.status}
@@ -388,16 +335,12 @@ const StudentList = () => {
                     
                     <div className={styles.mobileCardBody}>
                       <div className={styles.mobileCardStat}>
-                        <span className={styles.mobileStatLabel}>Department:</span>
-                        <span className={styles.mobileStatVal}>{student.department}</span>
+                        <span className={styles.mobileStatLabel}>Class:</span>
+                        <span className={styles.mobileStatVal}>Class {student.class} – {student.section}</span>
                       </div>
                       <div className={styles.mobileCardStat}>
-                        <span className={styles.mobileStatLabel}>Year:</span>
-                        <span className={styles.mobileStatVal}>Year {student.year}</span>
-                      </div>
-                      <div className={styles.mobileCardStat}>
-                        <span className={styles.mobileStatLabel}>GPA:</span>
-                        <span className={`${styles.mobileStatVal} ${styles.gpaBadge}`}>{student.gpa.toFixed(2)}</span>
+                        <span className={styles.mobileStatLabel}>Roll No:</span>
+                        <span className={`${styles.mobileStatVal} ${styles.gpaBadge}`}>#{student.rollNo}</span>
                       </div>
                     </div>
                     
@@ -473,9 +416,7 @@ const StudentList = () => {
                 className="btn btn-secondary" 
                 onClick={() => {
                   setSearchTerm('');
-                  setSelectedDept('');
                   setSelectedStatus('');
-                  setSelectedYear('');
                 }}
               >
                 Reset Search Filters

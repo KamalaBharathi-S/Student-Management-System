@@ -59,9 +59,8 @@ const Announcements = () => {
                 <label className="form-label">Audience</label>
                 <select className="form-select" value={formData.audience} onChange={e => setFormData({...formData, audience: e.target.value})}>
                   <option>All</option>
-                  <option>All Students</option>
-                  <option>All Parents</option>
-                  <option>Specific Batch</option>
+                  <option>Students</option>
+                  <option>Parents</option>
                 </select>
               </div>
               <div className="form-group">

@@ -1,60 +1,89 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
 import { useStudents } from '../hooks/useStudents';
+import { useAcademy } from '../context/AcademyContext';
 import styles from './AnalyticsCharts.module.css';
 
 Chart.register(...registerables);
 
+const SUBJECTS = ['Mathematics', 'Science', 'English', 'Tamil', 'Social Studies'];
+
 const AnalyticsCharts = () => {
-  const { students, departments, theme } = useStudents();
-  
-  const deptChartRef = useRef(null);
-  const yearChartRef = useRef(null);
-  const deptChartInstance = useRef(null);
-  const yearChartInstance = useRef(null);
+  const { students, theme } = useStudents();
+  const { studentPerformance } = useAcademy();
+
+  const marksChartRef   = useRef(null);
+  const genderChartRef  = useRef(null);
+  const marksChartInst  = useRef(null);
+  const genderChartInst = useRef(null);
+
+  const textColor  = theme === 'dark' ? '#94a3b8' : '#475569';
+  const gridColor  = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)';
+  const borderBg   = theme === 'dark' ? '#111827' : '#ffffff';
 
   useEffect(() => {
-    // 1. Department Chart (Doughnut)
-    if (deptChartRef.current) {
-      if (deptChartInstance.current) {
-        deptChartInstance.current.destroy();
-      }
+    // ── Chart 1: Unit Test 1 marks across subjects (Bar) ────────
+    if (marksChartRef.current) {
+      marksChartInst.current?.destroy();
 
-      const deptData = departments.map(dept => 
-        students.filter(s => s.department === dept).length
-      );
+      const marks  = studentPerformance?.marks || [];
+      const ut1    = SUBJECTS.map(s => marks.find(m => m.subject === s)?.ut1   ?? 0);
+      const half   = SUBJECTS.map(s => marks.find(m => m.subject === s)?.halfYearly ?? 0);
 
-      deptChartInstance.current = new Chart(deptChartRef.current, {
-        type: 'doughnut',
+      marksChartInst.current = new Chart(marksChartRef.current, {
+        type: 'bar',
         data: {
-          labels: departments,
-          datasets: [{
-            data: deptData,
-            backgroundColor: [
-              '#6366f1', // Indigo
-              '#10b981', // Emerald
-              '#f59e0b', // Amber
-              '#0ea5e9', // Sky Blue
-              '#ec4899'  // Pink
-            ],
-            borderColor: theme === 'dark' ? '#0f1524' : '#ffffff',
-            borderWidth: 2
-          }]
+          labels: SUBJECTS.map(s => s.split(' ')[0]),
+          datasets: [
+            {
+              label: 'Unit Test 1',
+              data: ut1,
+              backgroundColor: 'rgba(99,102,241,0.85)',
+              borderRadius: 6,
+              borderWidth: 0,
+            },
+            {
+              label: 'Half Yearly',
+              data: half,
+              backgroundColor: 'rgba(16,185,129,0.75)',
+              borderRadius: 6,
+              borderWidth: 0,
+            }
+          ],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: 'bottom',
+              position: 'top',
               labels: {
-                color: theme === 'dark' ? '#cbd5e1' : '#334155',
-                font: {
-                  family: 'Outfit',
-                  size: 11,
-                  weight: 'bold'
-                },
-                padding: 15
+                color: textColor,
+                font: { family: 'Inter', size: 11 },
+                usePointStyle: true,
+                pointStyleWidth: 8,
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}/100`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+            },
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: { color: gridColor },
+              ticks: {
+                stepSize: 20,
+                color: textColor,
+                font: { family: 'Inter', size: 11 },
+                callback: v => `${v}`
               }
             }
           }
@@ -62,59 +91,43 @@ const AnalyticsCharts = () => {
       });
     }
 
-    // 2. Year Chart (Bar)
-    if (yearChartRef.current) {
-      if (yearChartInstance.current) {
-        yearChartInstance.current.destroy();
-      }
+    // ── Chart 2: Gender split (Doughnut) ─────────────────────────
+    if (genderChartRef.current) {
+      genderChartInst.current?.destroy();
 
-      const yearData = ['1', '2', '3', '4'].map(yr => 
-        students.filter(s => String(s.year) === yr).length
-      );
+      const boys  = students.filter(s => s.gender === 'Male').length;
+      const girls = students.filter(s => s.gender === 'Female').length;
 
-      yearChartInstance.current = new Chart(yearChartRef.current, {
-        type: 'bar',
+      genderChartInst.current = new Chart(genderChartRef.current, {
+        type: 'doughnut',
         data: {
-          labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4'],
+          labels: ['Boys', 'Girls'],
           datasets: [{
-            label: 'Students Count',
-            data: yearData,
-            backgroundColor: 'rgba(99, 102, 241, 0.85)',
-            hoverBackgroundColor: '#6366f1',
-            borderRadius: 6,
-            borderWidth: 0
+            data: [boys, girls],
+            backgroundColor: ['#6366f1', '#ec4899'],
+            borderColor: borderBg,
+            borderWidth: 3,
+            hoverOffset: 6,
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          cutout: '68%',
           plugins: {
             legend: {
-              display: false
-            }
-          },
-          scales: {
-            x: {
-              grid: {
-                display: false
-              },
-              ticks: {
-                color: theme === 'dark' ? '#94a3b8' : '#475569',
-                font: {
-                  family: 'Outfit'
-                }
+              position: 'bottom',
+              labels: {
+                color: textColor,
+                font: { family: 'Inter', size: 12, weight: '600' },
+                padding: 16,
+                usePointStyle: true,
+                pointStyleWidth: 10,
               }
             },
-            y: {
-              grid: {
-                color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'
-              },
-              ticks: {
-                stepSize: 1,
-                color: theme === 'dark' ? '#94a3b8' : '#475569',
-                font: {
-                  family: 'Outfit'
-                }
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed} student${ctx.parsed !== 1 ? 's' : ''}`
               }
             }
           }
@@ -123,30 +136,26 @@ const AnalyticsCharts = () => {
     }
 
     return () => {
-      if (deptChartInstance.current) {
-        deptChartInstance.current.destroy();
-      }
-      if (yearChartInstance.current) {
-        yearChartInstance.current.destroy();
-      }
+      marksChartInst.current?.destroy();
+      genderChartInst.current?.destroy();
     };
-  }, [students, theme, departments]);
+  }, [students, theme, studentPerformance]);
 
   return (
     <div className={styles.chartsGrid}>
       <div className={styles.chartCard}>
-        <h3 className={styles.chartTitle}>Students by Department</h3>
-        <p className={styles.chartSubtitle}>Academic split across all faculties</p>
+        <h3 className={styles.chartTitle}>Subject-wise Marks – Class 8A</h3>
+        <p className={styles.chartSubtitle}>Comparison: Unit Test 1 vs Half Yearly</p>
         <div className={styles.chartCanvasContainer}>
-          <canvas ref={deptChartRef}></canvas>
+          <canvas ref={marksChartRef}></canvas>
         </div>
       </div>
 
       <div className={styles.chartCard}>
-        <h3 className={styles.chartTitle}>Students by Year</h3>
-        <p className={styles.chartSubtitle}>Enrolment counts by class year</p>
+        <h3 className={styles.chartTitle}>Class Gender Split</h3>
+        <p className={styles.chartSubtitle}>Boys vs Girls in Class 8-A</p>
         <div className={styles.chartCanvasContainer}>
-          <canvas ref={yearChartRef}></canvas>
+          <canvas ref={genderChartRef}></canvas>
         </div>
       </div>
     </div>

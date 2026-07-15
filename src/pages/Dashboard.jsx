@@ -1,184 +1,217 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { UserPlus, Users, ArrowRight, Eye, FileSpreadsheet, FileJson } from 'lucide-react';
+import { UserPlus, Users, ArrowRight, Trophy, Medal, Star } from 'lucide-react';
 import { useStudents } from '../hooks/useStudents';
+import { useAcademy } from '../context/AcademyContext';
 import DashboardStats from '../components/DashboardStats';
 import AnalyticsCharts from '../components/AnalyticsCharts';
 import Header from '../components/Header';
 import styles from './Dashboard.module.css';
 
+// Rank badge config
+const RANK_CONFIG = [
+  { rank: 1, label: '1st', icon: <Trophy size={15} />,  bg: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff'  },
+  { rank: 2, label: '2nd', icon: <Medal  size={15} />,  bg: 'linear-gradient(135deg,#94a3b8,#64748b)', color: '#fff'  },
+  { rank: 3, label: '3rd', icon: <Star   size={15} />,  bg: 'linear-gradient(135deg,#b45309,#92400e)', color: '#fff'  },
+];
+
 const Dashboard = () => {
   const { students } = useStudents();
+  const { studentPerformance } = useAcademy();
   const navigate = useNavigate();
-
-  const recentStudents = students.slice(0, 5);
 
   const getInitials = (name) => {
     if (!name) return 'ST';
     return name.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2).toUpperCase();
   };
 
-  const exportCSV = () => {
-    if (students.length === 0) return;
-    const headers = ['ID', 'Name', 'Email', 'Phone', 'Department', 'Year', 'Gender', 'Date of Birth', 'Address', 'Created At', 'GPA', 'Status'];
-    const rows = students.map(s => [
-      s.id, s.name, s.email, s.phone, s.department, s.year, s.gender, s.dateOfBirth, s.address, s.createdAt, s.gpa, s.status
-    ]);
-    
-    const csvContent = "data:text/csv;charset=utf-8," 
-      + [headers.join(','), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n');
-      
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `student_records_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  // ── Build Toppers List ───────────────────────────────────────
+  // Compute average UT1 score per student from marks data
+  // Since we have full marks in academyData for all students,
+  // we use a map: student name → average score
+  const marksMap = {
+    'Meena Lakshmi': { ut1Avg: (95 + 88 + 91 + 94 + 87) / 5, grade: 'O'  },
+    'Anitha Selvam': { ut1Avg: (90 + 85 + 88 + 92 + 82) / 5, grade: 'A+' },
+    'Arjun Kumar':   { ut1Avg: (88 + 76 + 92 + 85 + 80) / 5, grade: 'A+' },
+    'Divya Menon':   { ut1Avg: (83 + 80 + 86 + 89 + 77) / 5, grade: 'A'  },
+    'Kiran Raj':     { ut1Avg: (70 + 65 + 72 + 68 + 78) / 5, grade: 'B+' },
+    'Rohit Patel':   { ut1Avg: (60 + 55 + 67 + 62 + 70) / 5, grade: 'C+' },
   };
 
-  const exportJSON = () => {
-    if (students.length === 0) return;
-    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(students, null, 2)
-    )}`;
-    const link = document.createElement("a");
-    link.setAttribute("href", jsonString);
-    link.setAttribute("download", `student_records_${new Date().toISOString().slice(0,10)}.json`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const toppers = students
+    .map(s => ({
+      ...s,
+      avgScore: marksMap[s.name]?.ut1Avg ?? 0,
+      grade:    marksMap[s.name]?.grade ?? '–',
+    }))
+    .sort((a, b) => b.avgScore - a.avgScore);
 
   return (
     <div className="main-content">
-      <Header title="Academy Dashboard" />
-      
+      <Header title="School Dashboard" />
+
       <div className="page-wrapper">
         <DashboardStats />
-        
-        {/* Render AnalyticsCharts (both department and year split) in middle section */}
         <AnalyticsCharts />
-        
+
         <div className={styles.dashboardGrid}>
-          {/* Recent Enrollments Table */}
+          {/* ── Toppers List ─────────────────────────────────── */}
           <div className={styles.dashboardMain}>
             <div className={styles.tableCard}>
               <div className={styles.cardHeaderFlex}>
                 <div>
-                  <h3 className={styles.cardTitle}>Recent Enrollments</h3>
-                  <p className={styles.cardSubtitle}>Latest 5 students added to the portal</p>
+                  <h3 className={styles.cardTitle}>🏆 Class Toppers</h3>
+                  <p className={styles.cardSubtitle}>Ranked by Unit Test 1 average score – Class 8A</p>
                 </div>
-                <Link to="/students" className={styles.btnLink}>
-                  View All Students <ArrowRight size={16} />
+                <Link to="/teacher/marks" className={styles.btnLink}>
+                  View Marks <ArrowRight size={16} />
                 </Link>
               </div>
-              
+
               <div className={styles.tableResponsive}>
-                {recentStudents.length > 0 ? (
+                {toppers.length > 0 ? (
                   <table className="custom-table">
                     <thead>
                       <tr>
+                        <th>Rank</th>
                         <th>Student</th>
-                        <th>Department</th>
-                        <th>GPA</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Roll No.</th>
+                        <th>Avg Score</th>
+                        <th>Grade</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {recentStudents.map((student) => (
-                        <tr key={student.id}>
-                          <td>
-                            <div className={styles.studentProfileCell}>
-                              <div 
-                                className={styles.studentCellAvatar} 
-                                style={{ background: student.avatarColor }}
-                              >
-                                {getInitials(student.name)}
+                      {toppers.map((student, index) => {
+                        const rankCfg = RANK_CONFIG[index] || null;
+                        return (
+                          <tr key={student.id}>
+                            {/* Rank badge */}
+                            <td>
+                              {rankCfg ? (
+                                <span style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 5,
+                                  background: rankCfg.bg,
+                                  color: rankCfg.color,
+                                  padding: '3px 10px',
+                                  borderRadius: 'var(--radius-full)',
+                                  fontSize: 12,
+                                  fontWeight: 700,
+                                }}>
+                                  {rankCfg.icon} {rankCfg.label}
+                                </span>
+                              ) : (
+                                <span style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: 13 }}>
+                                  #{index + 1}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Student cell */}
+                            <td>
+                              <div className={styles.studentProfileCell}>
+                                <div
+                                  className={styles.studentCellAvatar}
+                                  style={{ background: student.avatarColor }}
+                                >
+                                  {getInitials(student.name)}
+                                </div>
+                                <div className={styles.studentCellInfo}>
+                                  <span className={styles.studentCellName}>{student.name}</span>
+                                  <span className={styles.studentCellId}>{student.id}</span>
+                                </div>
                               </div>
-                              <div className={styles.studentCellInfo}>
-                                <span className={styles.studentCellName}>{student.name}</span>
-                                <span className={styles.studentCellId}>{student.id}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td>{student.department}</td>
-                          <td>
-                            <span className={styles.gpaBadge}>{student.gpa.toFixed(2)}</span>
-                          </td>
-                          <td>
-                            <span className={`badge badge-${student.status.toLowerCase()}`}>
-                              {student.status}
-                            </span>
-                          </td>
-                          <td>
-                            <button 
-                              className={styles.actionBtnView}
-                              onClick={() => navigate(`/students/${student.id}`)}
-                              title="View Details"
-                            >
-                              <Eye size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+
+                            {/* Roll no */}
+                            <td>
+                              <span className={styles.gpaBadge}>#{student.rollNo}</span>
+                            </td>
+
+                            {/* Avg score */}
+                            <td>
+                              <span style={{
+                                fontWeight: 700,
+                                fontSize: 15,
+                                color: index === 0 ? '#f59e0b'
+                                       : index === 1 ? '#6366f1'
+                                       : index === 2 ? '#10b981'
+                                       : 'var(--text-primary)',
+                              }}>
+                                {student.avgScore.toFixed(1)}
+                                <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 400 }}>/100</span>
+                              </span>
+                            </td>
+
+                            {/* Grade */}
+                            <td>
+                              <span className={`badge ${
+                                student.grade === 'O'  || student.grade === 'A+' ? 'badge-present' :
+                                student.grade === 'A'  || student.grade === 'B+' ? 'badge-info'    :
+                                'badge-warning'
+                              }`}>
+                                {student.grade}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 ) : (
-                  <div className={styles.emptyStateMessage}>No students registered yet.</div>
+                  <div className={styles.emptyStateMessage}>No marks data available yet.</div>
                 )}
               </div>
             </div>
           </div>
-          
-          {/* Quick Actions Panel */}
+
+          {/* ── Quick Actions Panel ──────────────────────────── */}
           <div className={styles.dashboardSidebar}>
             <div className={`glass-card ${styles.actionsCard}`}>
               <h3 className={styles.cardTitle}>Quick Actions</h3>
-              <p className={styles.cardSubtitle}>Manage campus registrations</p>
-              
+              <p className={styles.cardSubtitle}>Class 8-A management</p>
+
               <div className={styles.actionButtonsList}>
-                <button 
+                <button
                   className="btn btn-primary w-full"
                   onClick={() => navigate('/add')}
                 >
                   <UserPlus size={18} />
                   Add New Student
                 </button>
-                
-                <button 
+
+                <button
                   className="btn btn-secondary w-full"
-                  onClick={() => navigate('/students')}
+                  onClick={() => navigate('/teacher/students')}
                 >
                   <Users size={18} />
-                  Manage Database
+                  View All Students
                 </button>
-                
+
                 <div className={styles.dividerLine}></div>
-                
-                <span className={styles.sectionLabel}>Data Administration</span>
-                
-                <div className={styles.exportButtonsRow}>
-                  <button 
-                    className="btn btn-secondary flex-1"
-                    onClick={exportCSV}
-                    disabled={students.length === 0}
-                    title="Export records to CSV Spreadsheet"
-                  >
-                    <FileSpreadsheet size={16} />
-                    CSV
-                  </button>
-                  <button 
-                    className="btn btn-secondary flex-1"
-                    onClick={exportJSON}
-                    disabled={students.length === 0}
-                    title="Export records to JSON"
-                  >
-                    <FileJson size={16} />
-                    JSON
-                  </button>
-                </div>
+                <span className={styles.sectionLabel}>Today's Class</span>
+
+                <button
+                  className="btn btn-outline w-full"
+                  onClick={() => navigate('/teacher/attendance')}
+                >
+                  Mark Attendance
+                </button>
+
+                <button
+                  className="btn btn-outline w-full"
+                  onClick={() => navigate('/teacher/homework')}
+                >
+                  Post Homework
+                </button>
+
+                <button
+                  className="btn btn-outline w-full"
+                  onClick={() => navigate('/announcements')}
+                >
+                  New Announcement
+                </button>
               </div>
             </div>
           </div>

@@ -73,8 +73,8 @@ const StudentProfile = () => {
                   <li className="flex items-start gap-3">
                     <GraduationCap className="text-[var(--text-muted)] mt-0.5" size={18} />
                     <div>
-                      <span className="block text-xs text-[var(--text-muted)]">Course & Year</span>
-                      <span className="font-medium text-[var(--text-primary)]">{student.department}, Year {student.year}</span>
+                      <span className="block text-xs text-[var(--text-muted)]">Class & Roll No</span>
+                      <span className="font-medium text-[var(--text-primary)]">Class {student.class}-{student.section}, Roll #{student.rollNo}</span>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -87,8 +87,22 @@ const StudentProfile = () => {
                   <li className="flex items-start gap-3">
                     <Phone className="text-[var(--text-muted)] mt-0.5" size={18} />
                     <div>
-                      <span className="block text-xs text-[var(--text-muted)]">Phone</span>
+                      <span className="block text-xs text-[var(--text-muted)]">Student Phone</span>
                       <span className="font-medium text-[var(--text-primary)]">{student.phone}</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <User className="text-[var(--text-muted)] mt-0.5" size={18} />
+                    <div>
+                      <span className="block text-xs text-[var(--text-muted)]">Parent/Guardian Name</span>
+                      <span className="font-medium text-[var(--text-primary)]">{student.parentName || 'N/A'}</span>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Phone className="text-[var(--text-muted)] mt-0.5" size={18} />
+                    <div>
+                      <span className="block text-xs text-[var(--text-muted)]">Parent/Guardian Phone</span>
+                      <span className="font-medium text-[var(--text-primary)]">{student.parentPhone || 'N/A'}</span>
                     </div>
                   </li>
                 </ul>

@@ -32,24 +32,19 @@ export const validateStudentForm = (formData) => {
     }
   }
 
-  if (!formData.department) {
-    errors.department = "Department is required.";
+  if (!formData.class) {
+    errors.class = "Class is required.";
   }
   
-  if (!formData.year) {
-    errors.year = "Academic year is required.";
-  } else {
-    const yearVal = parseInt(formData.year);
-    if (isNaN(yearVal) || yearVal < 1 || yearVal > 4) {
-      errors.year = "Academic year must be between 1 and 4.";
-    }
+  if (!formData.section) {
+    errors.section = "Section is required.";
   }
 
-  const gpaVal = parseFloat(formData.gpa);
-  if (formData.gpa === '' || isNaN(gpaVal)) {
-    errors.gpa = "GPA score is required.";
-  } else if (gpaVal < 0 || gpaVal > 4.0) {
-    errors.gpa = "GPA must be between 0.00 and 4.00.";
+  const rollVal = parseInt(formData.rollNo);
+  if (formData.rollNo === '' || isNaN(rollVal)) {
+    errors.rollNo = "Roll Number is required.";
+  } else if (rollVal <= 0) {
+    errors.rollNo = "Roll Number must be a positive integer.";
   }
 
   return {

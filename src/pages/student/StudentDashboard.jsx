@@ -1,12 +1,24 @@
 import React, { useEffect, useRef } from 'react';
 import Header from '../../components/Header';
 import { useAcademy } from '../../context/AcademyContext';
-import { Calendar, UploadCloud, BookOpen, CheckCircle } from 'lucide-react';
+import { useStudents } from '../../hooks/useStudents';
+import { Calendar, UploadCloud, Users, Megaphone } from 'lucide-react';
 import Chart from 'chart.js/auto';
+import styles from '../../components/DashboardStats.module.css';
 
 const StudentDashboard = () => {
-  const { studentPerformance } = useAcademy();
-  const { attendance, marks, tests } = studentPerformance;
+  const { studentPerformance, announcements } = useAcademy();
+  const { students } = useStudents();
+  const { attendance, marks, tests, homework, assignments } = studentPerformance;
+
+  const totalClassmates = students.length;
+  const pendingTasksCount = 
+    homework.filter(h => h.status !== 'Submitted').length + 
+    assignments.filter(a => a.status !== 'Submitted').length;
+    
+  const activeAnnouncements = announcements.filter(a => {
+    return new Date(a.expiryDate) >= new Date();
+  }).length;
 
   const marksChartRef = useRef(null);
 
@@ -49,31 +61,61 @@ const StudentDashboard = () => {
     };
   }, [marks]);
 
+  const stats = [
+    {
+      title: 'Total Classmates',
+      value: totalClassmates,
+      sub: 'Class 8-A enrolled',
+      icon: <Users size={22} />,
+      gradient: 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)',
+      colorClass: styles.primary,
+    },
+    {
+      title: 'Pending Assignments',
+      value: pendingTasksCount,
+      sub: 'Awaiting submission',
+      icon: <UploadCloud size={22} />,
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+      colorClass: styles.warning,
+    },
+    {
+      title: 'New Announcements',
+      value: activeAnnouncements,
+      sub: 'Currently visible',
+      icon: <Megaphone size={22} />,
+      gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+      colorClass: styles.info,
+    },
+    {
+      title: 'My Attendance',
+      value: `${attendance.percentage}%`,
+      sub: 'Overall presence',
+      icon: <Calendar size={22} />,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      colorClass: styles.success,
+    },
+  ];
+
   return (
     <div className="main-content">
       <Header title="Student Dashboard" />
       <div className="page-wrapper animate-fade">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10"><Calendar size={64}/></div>
-            <h3 className="text-[var(--text-muted)] text-sm font-semibold uppercase tracking-wider mb-2">My Attendance</h3>
-            <p className="text-4xl font-bold text-[var(--color-primary)]">{attendance.percentage}%</p>
-          </div>
-          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10"><UploadCloud size={64}/></div>
-            <h3 className="text-[var(--text-muted)] text-sm font-semibold uppercase tracking-wider mb-2">Pending Tasks</h3>
-            <p className="text-4xl font-bold text-[var(--color-warning)]">2</p>
-          </div>
-          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10"><BookOpen size={64}/></div>
-            <h3 className="text-[var(--text-muted)] text-sm font-semibold uppercase tracking-wider mb-2">Upcoming Tests</h3>
-            <p className="text-4xl font-bold text-[var(--color-info)]">{tests.filter(t => t.status === 'Available').length}</p>
-          </div>
-          <div className="glass-card p-6 flex flex-col justify-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10"><CheckCircle size={64}/></div>
-            <h3 className="text-[var(--text-muted)] text-sm font-semibold uppercase tracking-wider mb-2">Completed Tasks</h3>
-            <p className="text-4xl font-bold text-[var(--color-success)]">14</p>
-          </div>
+        <div className={`${styles.statsContainer} mb-8`}>
+          {stats.map((stat, index) => (
+            <div key={index} className={styles.statCard}>
+              <div className={styles.statInfo}>
+                <span className={styles.statTitle}>{stat.title}</span>
+                <span className={styles.statValue}>{stat.value}</span>
+                <span className={styles.statSub}>{stat.sub}</span>
+              </div>
+              <div
+                className={`${styles.statIconWrapper} ${stat.colorClass}`}
+                style={{ background: stat.gradient }}
+              >
+                {stat.icon}
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">

@@ -1,35 +1,60 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, GraduationCap, Megaphone, FileText, UploadCloud, FileBarChart, ClipboardCheck, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, User, GraduationCap, Megaphone, FileText, UploadCloud, FileBarChart, ClipboardCheck, CreditCard, Calendar, Library } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import styles from './Sidebar.module.css';
 
 const Sidebar = () => {
   const { role, currentUser } = useAuth();
 
+  const getRoleLabel = () => {
+    switch (role) {
+      case 'teacher': return 'Teacher Portal';
+      case 'student': return 'Student Portal';
+      case 'parent':  return 'Parent Portal';
+      default:        return 'Admin Portal';
+    }
+  };
+
   const getLinks = () => {
     switch (role) {
+      case 'teacher':
       case 'admin':
         return [
-          { to: '/', icon: LayoutDashboard, label: 'Dashboard', exact: true },
-          { to: '/students', icon: Users, label: 'Student List' },
-          { to: '/announcements', icon: Megaphone, label: 'Announcements' },
-          { to: '/daily-reports', icon: FileText, label: 'Daily Reports' },
-          { to: '/daily-work', icon: UploadCloud, label: 'Daily Work Upload' },
+          { to: '/',                    icon: LayoutDashboard, label: 'Dashboard',         exact: true },
+          { to: '/teacher/students',    icon: Users,           label: 'Student Database'             },
+          { to: '/teacher/biodata',     icon: User,            label: 'Student Biodata'              },
+          { to: '/teacher/attendance',  icon: ClipboardCheck,  label: 'Attendance'                   },
+          { to: '/teacher/fees',        icon: CreditCard,      label: 'Academic Fees'                },
+          { to: '/teacher/homework',    icon: FileText,        label: 'Homework'                     },
+          { to: '/teacher/assignments', icon: UploadCloud,     label: 'Assignments'                  },
+          { to: '/teacher/marks',       icon: FileBarChart,    label: 'Marks'                        },
+          { to: '/announcements',       icon: Megaphone,       label: 'Announcements'                },
+          { to: '/library',             icon: Library,         label: 'Library'                      },
         ];
       case 'parent':
         return [
-          { to: '/', icon: LayoutDashboard, label: 'Parent Dashboard', exact: true },
-          { to: '/student-profile', icon: Users, label: 'Student Profile' },
-          { to: '/marksheet', icon: FileBarChart, label: 'Marksheet' },
-          { to: '/assigned-work', icon: ClipboardCheck, label: 'Assigned Work' },
+          { to: '/',                   icon: LayoutDashboard, label: 'Dashboard',   exact: true },
+          { to: '/parent/biodata',     icon: User,            label: 'Biodata'                 },
+          { to: '/parent/attendance',  icon: ClipboardCheck,  label: 'Attendance'              },
+          { to: '/parent/fees',        icon: CreditCard,      label: 'Academic Fees'           },
+          { to: '/parent/timetable',   icon: Calendar,        label: 'Timetable'               },
+          { to: '/parent/homework',    icon: FileText,        label: 'Homework'                },
+          { to: '/parent/assignments', icon: UploadCloud,     label: 'Assignments'             },
+          { to: '/parent/marks',       icon: FileBarChart,    label: 'Marks'                   },
+          { to: '/announcements',      icon: Megaphone,       label: 'Announcements'           },
         ];
       case 'student':
         return [
-          { to: '/', icon: LayoutDashboard, label: 'Student Dashboard', exact: true },
-          { to: '/submissions', icon: UploadCloud, label: 'Assignment Submission' },
-          { to: '/online-tests', icon: FileText, label: 'Online Tests' },
-          { to: '/marks-results', icon: FileBarChart, label: 'Marks & Results' },
+          { to: '/',                    icon: LayoutDashboard, label: 'Dashboard',   exact: true },
+          { to: '/student/biodata',     icon: User,            label: 'Biodata'                 },
+          { to: '/student/attendance',  icon: ClipboardCheck,  label: 'Attendance'              },
+          { to: '/student/timetable',   icon: Calendar,        label: 'Timetable'               },
+          { to: '/student/homework',    icon: FileText,        label: 'Homework'                },
+          { to: '/student/assignments', icon: UploadCloud,     label: 'Assignments'             },
+          { to: '/student/marks',       icon: FileBarChart,    label: 'Marks'                   },
+          { to: '/announcements',       icon: Megaphone,       label: 'Announcements'           },
+          { to: '/library',             icon: Library,         label: 'Library'                 },
         ];
       default:
         return [];
@@ -37,39 +62,51 @@ const Sidebar = () => {
   };
 
   const links = getLinks();
+  const initials = currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U';
+  const roleLabel = currentUser?.role === 'teacher' ? 'Teacher' : currentUser?.role === 'parent' ? 'Parent / Guardian' : 'Student';
 
   return (
     <aside className={styles.sidebar}>
+      {/* Brand */}
       <div className={styles.sidebarBrand}>
-        <GraduationCap size={32} className={styles.brandIcon} />
-        <span className={styles.brandName}>Academy<span className={styles.brandHighlight}>Pro</span></span>
+        <div className={styles.brandIcon}>
+          <GraduationCap size={20} />
+        </div>
+        <span className={styles.brandName}>
+          Edu<span className={styles.brandHighlight}>Manage</span>
+        </span>
       </div>
-      
+
+      {/* Role Tag */}
+      <div className={styles.roleTag}>{getRoleLabel()}</div>
+
+      {/* Navigation */}
       <nav className={styles.sidebarNav}>
         {links.map((link) => {
           const Icon = link.icon;
           return (
-            <NavLink 
+            <NavLink
               key={link.to}
-              to={link.to} 
+              to={link.to}
               className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`}
               end={link.exact}
             >
-              <Icon size={20} />
+              <Icon size={18} />
               <span>{link.label}</span>
             </NavLink>
           );
         })}
       </nav>
-      
+
+      {/* Footer user info */}
       <div className={styles.sidebarFooter}>
         <div className={styles.userProfilePreview}>
-          <div className="w-8 h-8 rounded bg-[var(--bg-primary)] flex items-center justify-center font-bold text-[var(--color-primary)] shadow-inner">
-            {currentUser.name.charAt(0)}
+          <div className={styles.userAvatar}>
+            {initials}
           </div>
           <div className={styles.userInfo}>
-            <span className={styles.userName}>{currentUser.name}</span>
-            <span className={styles.userRole}>{role === 'admin' ? 'Administrator' : role === 'parent' ? 'Parent / Guardian' : 'Student'}</span>
+            <span className={styles.userName}>{currentUser?.name || 'User'}</span>
+            <span className={styles.userRole}>{roleLabel}</span>
           </div>
         </div>
       </div>

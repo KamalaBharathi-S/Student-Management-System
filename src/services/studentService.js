@@ -31,20 +31,22 @@ export const studentService = {
       ? Math.max(...students.map(s => parseInt(s.id.split('-')[2]) || 0)) + 1 
       : 1;
     const formattedNum = String(nextNum).padStart(3, '0');
-    const newId = `STU-${yearPrefix}-${formattedNum}`;
+    const newId = `ADM-${yearPrefix}-${formattedNum}`;
 
     const newStudent = {
       id: newId,
       name: studentData.name,
       email: studentData.email,
       phone: studentData.phone,
-      department: studentData.department,
-      year: String(studentData.year),
+      class: studentData.class || '8',
+      section: studentData.section || 'A',
+      rollNo: parseInt(studentData.rollNo) || (students.length + 1),
       gender: studentData.gender,
       dateOfBirth: studentData.dateOfBirth,
       address: studentData.address,
       createdAt: new Date().toISOString(),
-      gpa: parseFloat(studentData.gpa) || 0.0,
+      parentName: studentData.parentName || 'N/A',
+      parentPhone: studentData.parentPhone || 'N/A',
       status: studentData.status || 'Active',
       avatarColor: randomGradient
     };
@@ -63,12 +65,14 @@ export const studentService = {
           name: studentData.name,
           email: studentData.email,
           phone: studentData.phone,
-          department: studentData.department,
-          year: String(studentData.year),
+          class: studentData.class || '8',
+          section: studentData.section || 'A',
+          rollNo: parseInt(studentData.rollNo) || student.rollNo,
           gender: studentData.gender,
           dateOfBirth: studentData.dateOfBirth,
           address: studentData.address,
-          gpa: parseFloat(studentData.gpa) || 0.0,
+          parentName: studentData.parentName || student.parentName,
+          parentPhone: studentData.parentPhone || student.parentPhone,
           status: studentData.status
         };
       }

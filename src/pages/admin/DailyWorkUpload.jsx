@@ -4,67 +4,50 @@ import { UploadCloud, Plus, Calendar, CheckCircle2, Clock, Users } from 'lucide-
 import Header from '../../components/Header';
 
 const DailyWorkUpload = () => {
-  const { dailyWorks, addDailyWork } = useAcademy();
+  const { homework, addHomework } = useAcademy();
   const [showForm, setShowForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('assigned'); // 'assigned' or 'submissions'
+  const [activeTab, setActiveTab] = useState('assigned');
   
   const [formData, setFormData] = useState({
-    title: '', subject: '', description: '', assignedDate: new Date().toISOString().split('T')[0], dueDate: '', batch: '', priority: 'Medium'
+    title: '', subject: '', description: '', assignedDate: new Date().toISOString().split('T')[0], dueDate: '', priority: 'Medium'
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addDailyWork({
+    addHomework({
       ...formData,
-      attachment: 'uploaded_document.pdf' // Mocked attachment
+      attachment: 'uploaded_document.pdf'
     });
-    setFormData({ title: '', subject: '', description: '', assignedDate: new Date().toISOString().split('T')[0], dueDate: '', batch: '', priority: 'Medium' });
+    setFormData({ title: '', subject: '', description: '', assignedDate: new Date().toISOString().split('T')[0], dueDate: '', priority: 'Medium' });
     setShowForm(false);
   };
 
-  const [filterStandard, setFilterStandard] = useState('');
-  const [filterSection, setFilterSection] = useState('');
+  const [filterSubject, setFilterSubject] = useState('');
   const [filterDate, setFilterDate] = useState('');
 
   // Derived filter logic
-  const filteredWorks = dailyWorks.filter(work => {
-    // Basic mock logic: since work.batch is like "CSE-2024", we'll just check if it matches standard/section text for demo purposes, 
-    // or just let it pass if filter is empty. 
-    // In a real app, work object would have standard, section, date properties.
-    // For now, let's filter by date and use batch string matching.
+  const filteredWorks = homework.filter(work => {
     const matchDate = filterDate ? work.assignedDate === filterDate : true;
-    const matchStandard = filterStandard ? work.batch.toLowerCase().includes(filterStandard.toLowerCase()) : true;
-    const matchSection = filterSection ? work.batch.toLowerCase().includes(filterSection.toLowerCase()) : true;
+    const matchSubject = filterSubject ? work.subject.toLowerCase() === filterSubject.toLowerCase() : true;
     
-    return matchDate && matchStandard && matchSection;
+    return matchDate && matchSubject;
   });
 
   return (
     <div className="main-content">
-      <Header title="Daily Work & Assignments" />
+      <Header title="Class 8-A Homework" />
       <div className="page-wrapper animate-fade">
         {/* Filter Bar */}
         <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-4 rounded-xl mb-6 shadow-sm flex flex-col md:flex-row gap-4">
           <div className="flex-1">
-            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase mb-1 block">Standard</label>
-            <select className="form-select w-full" value={filterStandard} onChange={e => setFilterStandard(e.target.value)}>
-              <option value="">All Standards</option>
-              <option value="10th">10th Standard</option>
-              <option value="11th">11th Standard</option>
-              <option value="12th">12th Standard</option>
-              <option value="CSE">CSE</option>
-              <option value="ECE">ECE</option>
-            </select>
-          </div>
-          <div className="flex-1">
-            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase mb-1 block">Section</label>
-            <select className="form-select w-full" value={filterSection} onChange={e => setFilterSection(e.target.value)}>
-              <option value="">All Sections</option>
-              <option value="A">Section A</option>
-              <option value="B">Section B</option>
-              <option value="C">Section C</option>
-              <option value="2023">2023 Batch</option>
-              <option value="2024">2024 Batch</option>
+            <label className="text-xs font-semibold text-[var(--text-muted)] uppercase mb-1 block">Subject</label>
+            <select className="form-select w-full" value={filterSubject} onChange={e => setFilterSubject(e.target.value)}>
+              <option value="">All Subjects</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Science">Science</option>
+              <option value="English">English</option>
+              <option value="Tamil">Tamil</option>
+              <option value="Social Studies">Social Studies</option>
             </select>
           </div>
           <div className="flex-1">
@@ -85,7 +68,7 @@ const DailyWorkUpload = () => {
 
         {showForm && (
           <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] p-6 rounded-xl mb-8 shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">Assign New Daily Work</h3>
+            <h3 className="text-lg font-semibold mb-4">Post New Homework</h3>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="form-group">
                 <label className="form-label">Work Title</label>
@@ -93,7 +76,14 @@ const DailyWorkUpload = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Subject</label>
-                <input required type="text" className="form-input" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})} />
+                <select required className="form-select" value={formData.subject} onChange={e => setFormData({...formData, subject: e.target.value})}>
+                  <option value="">Select Subject...</option>
+                  <option value="Mathematics">Mathematics</option>
+                  <option value="Science">Science</option>
+                  <option value="English">English</option>
+                  <option value="Tamil">Tamil</option>
+                  <option value="Social Studies">Social Studies</option>
+                </select>
               </div>
               <div className="form-group col-span-2">
                 <label className="form-label">Description / Instructions</label>
@@ -102,10 +92,6 @@ const DailyWorkUpload = () => {
               <div className="form-group">
                 <label className="form-label">Due Date</label>
                 <input required type="date" className="form-input" value={formData.dueDate} onChange={e => setFormData({...formData, dueDate: e.target.value})} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Target Batch</label>
-                <input required type="text" placeholder="e.g. CSE-2024" className="form-input" value={formData.batch} onChange={e => setFormData({...formData, batch: e.target.value})} />
               </div>
               <div className="form-group">
                 <label className="form-label">Priority</label>
@@ -141,7 +127,7 @@ const DailyWorkUpload = () => {
                 <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mb-4">{work.description}</p>
                 
                 <div className="flex flex-wrap gap-3 text-xs mt-auto pt-3 border-t border-[var(--border-color)]">
-                  <span className="flex items-center gap-1 text-[var(--text-muted)]"><Users size={14}/> {work.batch}</span>
+                  <span className="flex items-center gap-1 text-[var(--text-muted)]"><Users size={14}/> Class 8-A</span>
                   <span className="flex items-center gap-1 text-[var(--text-muted)]"><Calendar size={14}/> Assigned: {work.assignedDate}</span>
                   <span className="flex items-center gap-1 font-semibold text-[var(--color-danger)]"><Clock size={14}/> Due: {work.dueDate}</span>
                 </div>

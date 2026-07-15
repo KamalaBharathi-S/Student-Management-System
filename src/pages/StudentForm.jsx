@@ -7,7 +7,7 @@ import Header from '../components/Header';
 import styles from './StudentForm.module.css';
 
 const StudentForm = () => {
-  const { addStudent, updateStudent, getStudentById, departments, statuses } = useStudents();
+  const { addStudent, updateStudent, getStudentById, classes, sections, statuses } = useStudents();
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
@@ -18,11 +18,13 @@ const StudentForm = () => {
     phone: '',
     dateOfBirth: '',
     gender: 'Male',
-    department: departments[0] || 'Computer Science',
-    year: '1',
-    gpa: '',
+    class: '8',
+    section: 'A',
+    rollNo: '',
     status: 'Active',
-    address: ''
+    address: '',
+    parentName: '',
+    parentPhone: ''
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -35,7 +37,7 @@ const StudentForm = () => {
       if (student) {
         setFormData({
           ...student,
-          gpa: String(student.gpa)
+          rollNo: String(student.rollNo)
         });
       } else {
         navigate('/students');
@@ -162,22 +164,31 @@ const StudentForm = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="year">Academic Year</label>
-                <select 
-                  id="year"
-                  name="year"
-                  value={formData.year}
+                <label className="form-label" htmlFor="parentName">Parent/Guardian Name</label>
+                <input 
+                  type="text" 
+                  id="parentName"
+                  name="parentName"
+                  value={formData.parentName}
                   onChange={handleChange}
-                  className="form-select"
-                >
-                  <option value="1">1st Year (Freshman)</option>
-                  <option value="2">2nd Year (Sophomore)</option>
-                  <option value="3">3rd Year (Junior)</option>
-                  <option value="4">4th Year (Senior)</option>
-                </select>
-                {errors.year && (
-                  <span className="form-error"><AlertCircle size={12} /> {errors.year}</span>
-                )}
+                  className="form-input"
+                  placeholder="e.g. Robert Vance"
+                />
+              </div>
+            </div>
+            
+            <div className={styles.fieldsGrid2col} style={{ marginTop: '20px' }}>
+              <div className="form-group">
+                <label className="form-label" htmlFor="parentPhone">Parent/Guardian Phone</label>
+                <input 
+                  type="tel" 
+                  id="parentPhone"
+                  name="parentPhone"
+                  value={formData.parentPhone}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="e.g. 9876543210"
+                />
               </div>
             </div>
           </div>
@@ -238,36 +249,55 @@ const StudentForm = () => {
             <h4 className={styles.sectionTitle}>Academic Details</h4>
             <div className={styles.fieldsGrid3col}>
               <div className="form-group">
-                <label className="form-label" htmlFor="department">Department</label>
+                <label className="form-label" htmlFor="class">Class</label>
                 <select 
-                  id="department"
-                  name="department"
-                  value={formData.department}
+                  id="class"
+                  name="class"
+                  value={formData.class}
                   onChange={handleChange}
                   className="form-select"
                 >
-                  {departments.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
+                  {classes.map(c => (
+                    <option key={c} value={c}>Class {c}</option>
                   ))}
                 </select>
+                {errors.class && (
+                  <span className="form-error"><AlertCircle size={12} /> {errors.class}</span>
+                )}
               </div>
 
               <div className="form-group">
-                <label className="form-label" htmlFor="gpa">Cumulative GPA</label>
+                <label className="form-label" htmlFor="section">Section</label>
+                <select 
+                  id="section"
+                  name="section"
+                  value={formData.section}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  {sections.map(s => (
+                    <option key={s} value={s}>Section {s}</option>
+                  ))}
+                </select>
+                {errors.section && (
+                  <span className="form-error"><AlertCircle size={12} /> {errors.section}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="rollNo">Roll Number</label>
                 <input 
                   type="number" 
-                  step="0.01"
-                  min="0.00"
-                  max="4.00"
-                  id="gpa"
-                  name="gpa"
-                  value={formData.gpa}
+                  min="1"
+                  id="rollNo"
+                  name="rollNo"
+                  value={formData.rollNo}
                   onChange={handleChange}
-                  className={`form-input ${errors.gpa ? styles.inputError : ''}`}
-                  placeholder="0.00 - 4.00"
+                  className={`form-input ${errors.rollNo ? styles.inputError : ''}`}
+                  placeholder="e.g. 15"
                 />
-                {errors.gpa && (
-                  <span className="form-error"><AlertCircle size={12} /> {errors.gpa}</span>
+                {errors.rollNo && (
+                  <span className="form-error"><AlertCircle size={12} /> {errors.rollNo}</span>
                 )}
               </div>
 

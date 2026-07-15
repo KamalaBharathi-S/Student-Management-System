@@ -1,6 +1,10 @@
 import React, { createContext, useState, useEffect } from 'react';
 import studentService from '../services/studentService';
-import { DEPARTMENTS, STATUSES } from '../data/students';
+import { SUBJECTS, STATUSES } from '../data/students';
+
+const CLASSES = ['8'];
+const SECTIONS = ['A', 'B', 'C'];
+const SCHOOL_SUBJECTS = SUBJECTS.map(s => s.name);
 
 export const StudentContext = createContext();
 
@@ -54,7 +58,9 @@ export const StudentProvider = ({ children }) => {
   return (
     <StudentContext.Provider value={{
       students,
-      departments: DEPARTMENTS,
+      classes: CLASSES,
+      sections: SECTIONS,
+      subjects: SCHOOL_SUBJECTS,
       statuses: STATUSES,
       theme,
       toggleTheme,

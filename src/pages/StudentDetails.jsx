@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2, Calendar, Mail, Phone, MapPin, Award, User, Clock } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, Mail, Phone, MapPin, Award, User, Clock, Users } from 'lucide-react';
 import { useStudents } from '../hooks/useStudents';
 import Header from '../components/Header';
+import StudentBiodata from './student/StudentBiodata';
 import styles from './StudentDetails.module.css';
 
 const StudentDetails = () => {
@@ -11,7 +12,7 @@ const StudentDetails = () => {
   const { getStudentById, deleteStudent } = useStudents();
   const student = getStudentById(id);
 
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('personal');
 
   if (!student) {
     return (
@@ -110,7 +111,7 @@ const StudentDetails = () => {
                 className={`${styles.tabBtn} ${activeTab === 'personal' ? styles.active : ''}`}
                 onClick={() => setActiveTab('personal')}
               >
-                Personal Details
+                Biodata
               </button>
             </div>
           </div>
@@ -123,20 +124,14 @@ const StudentDetails = () => {
                 
                 <div className={styles.academicStatsRow}>
                   <div className={styles.statDisplayBox}>
-                    <span className={styles.statLabel}>Cumulative GPA</span>
-                    <span className={styles.statValueHighlight}>{student.gpa.toFixed(2)}</span>
-                    <div className={styles.gpaProgressTrack}>
-                      <div 
-                        className={styles.gpaProgressFill} 
-                        style={{ width: `${(student.gpa / 4.0) * 100}%` }}
-                      ></div>
-                    </div>
+                    <span className={styles.statLabel}>Roll Number</span>
+                    <span className={styles.statValueHighlight}>#{student.rollNo}</span>
                   </div>
                   
                   <div className={styles.statDisplayBox}>
-                    <span className={styles.statLabel}>Standing Status</span>
+                    <span className={styles.statLabel}>Admission Number</span>
                     <span className={`${styles.statValueHighlight} ${styles.textGreen}`}>
-                      {student.gpa >= 3.5 ? 'Excellent' : student.gpa >= 3.0 ? 'Good' : student.gpa >= 2.0 ? 'Satisfactory' : 'Critical'}
+                      {student.id.split('-')[2]}
                     </span>
                   </div>
                 </div>
@@ -145,8 +140,8 @@ const StudentDetails = () => {
                   <div className={styles.infoItemBlock}>
                     <Award size={18} className={styles.infoIcon} />
                     <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Department</span>
-                      <span className={styles.infoValue}>{student.department}</span>
+                      <span className={styles.infoLabel}>Class</span>
+                      <span className={styles.infoValue}>Class {student.class}</span>
                     </div>
                   </div>
 
@@ -161,9 +156,9 @@ const StudentDetails = () => {
                   <div className={styles.infoItemBlock}>
                     <Clock size={18} className={styles.infoIcon} />
                     <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Academic Year</span>
+                      <span className={styles.infoLabel}>Section</span>
                       <span className={styles.infoValue}>
-                        Year {student.year}
+                        Section {student.section}
                       </span>
                     </div>
                   </div>
@@ -179,55 +174,7 @@ const StudentDetails = () => {
               </div>
             ) : (
               <div className="tab-pane-content animate-fade">
-                <h3 className={styles.paneSectionTitle}>Demographics & Contact</h3>
-                
-                <div className={styles.detailsInfoGrid}>
-                  <div className={styles.infoItemBlock}>
-                    <User size={18} className={styles.infoIcon} />
-                    <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Gender Identity</span>
-                      <span className={styles.infoValue}>{student.gender}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoItemBlock}>
-                    <Calendar size={18} className={styles.infoIcon} />
-                    <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Date of Birth</span>
-                      <span className={styles.infoValue}>{formattedDob}</span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoItemBlock}>
-                    <Mail size={18} className={styles.infoIcon} />
-                    <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Email Address</span>
-                      <span className={styles.infoValue}>
-                        <a href={`mailto:${student.email}`} className={styles.emailLink}>
-                          {student.email}
-                        </a>
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={styles.infoItemBlock}>
-                    <Phone size={18} className={styles.infoIcon} />
-                    <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Phone Number</span>
-                      <span className={styles.infoValue}>{student.phone}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className={styles.addressSectionBlock}>
-                  <div className={styles.infoItemBlock} style={{ alignItems: 'flex-start' }}>
-                    <MapPin size={18} className={styles.infoIcon} style={{ marginTop: '4px' }} />
-                    <div className={styles.infoLabelVal}>
-                      <span className={styles.infoLabel}>Residential Address</span>
-                      <span className={styles.infoValueBlock}>{student.address || 'No residential address on file.'}</span>
-                    </div>
-                  </div>
-                </div>
+                <StudentBiodata isEmbedded={true} studentId={student.id} />
               </div>
             )}
           </div>

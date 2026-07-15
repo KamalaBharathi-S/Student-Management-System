@@ -5,11 +5,11 @@ import { useAuth } from '../../context/AuthContext';
 import { Calendar, Clock, Download, CheckCircle2 } from 'lucide-react';
 
 const AssignedWorkView = () => {
-  const { dailyWorks } = useAcademy();
+  const { homework } = useAcademy();
   const { currentUser } = useAuth();
   
   // Filter works assigned to the student's batch or all. For mock, just show all.
-  const myWorks = dailyWorks;
+  const myWorks = homework;
 
   return (
     <div className="main-content">
@@ -49,7 +49,7 @@ const AssignedWorkView = () => {
                     <CheckCircle2 size={16} className="mt-0.5" />
                     <div>
                       <p className="font-semibold">Submitted on {submission.date}</p>
-                      {submission.remarks && <p className="mt-1 italic text-xs">Faculty Remark: "{submission.remarks}"</p>}
+                      {submission.remarks && <p className="mt-1 italic text-xs">Teacher Remark: "{submission.remarks}"</p>}
                     </div>
                   </div>
                 )}

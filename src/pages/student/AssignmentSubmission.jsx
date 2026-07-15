@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Calendar, Clock, Download, UploadCloud, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const AssignmentSubmission = () => {
-  const { dailyWorks, submitAssignment } = useAcademy();
+  const { homework, submitHomework } = useAcademy();
   const { currentUser } = useAuth();
   
   const [selectedWork, setSelectedWork] = useState(null);
@@ -14,7 +14,7 @@ const AssignmentSubmission = () => {
   const handleUpload = (e) => {
     e.preventDefault();
     if (selectedWork && file) {
-      submitAssignment(selectedWork.id, currentUser.studentId, file.name);
+      submitHomework(selectedWork.id, currentUser.studentId, file.name);
       setSelectedWork(null);
       setFile(null);
     }
@@ -28,7 +28,7 @@ const AssignmentSubmission = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 grid gap-4">
-            {dailyWorks.map(work => {
+            {homework.map(work => {
               const submission = work.submissions.find(s => s.studentId === currentUser.studentId);
               const isSubmitted = !!submission;
 

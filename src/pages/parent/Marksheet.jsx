@@ -25,12 +25,14 @@ const Marksheet = () => {
         <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl overflow-hidden shadow-sm">
           <div className="p-6 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--bg-primary)]">
             <div>
-              <h3 className="font-bold text-lg">Semester 4 Results</h3>
-              <p className="text-sm text-[var(--text-muted)]">Academic Year 2025-2026</p>
+              <h3 className="font-bold text-lg">Unit Test 1 Results</h3>
+              <p className="text-sm text-[var(--text-muted)]">Class 8-A • Academic Year 2025-2026</p>
             </div>
             <div className="text-right">
-              <span className="block text-sm text-[var(--text-muted)]">Total GPA</span>
-              <span className="font-bold text-2xl text-[var(--color-primary)]">3.8</span>
+              <span className="block text-sm text-[var(--text-muted)]">Average Score</span>
+              <span className="font-bold text-2xl text-[var(--color-primary)]">
+                {(marks.reduce((acc, m) => acc + m.internal + m.practical + m.exam, 0) / marks.length).toFixed(1)}%
+              </span>
             </div>
           </div>
           <table className="w-full text-left border-collapse">
